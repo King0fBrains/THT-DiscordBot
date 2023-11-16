@@ -1,15 +1,17 @@
 import discord
 import asyncio
-
+import logging
+import logging.handlers
 from discord.ext import commands
 
-token = 'OTk1MTkxNjkzNjM4OTA1OTc3.GbnSNo.Rc1pG0PSZ549tTAKCAWVzRspe6tKku9ITRxbDQ'
+file_read = open('token.txt', 'r')
+token = file_read.readline()
 
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='.', description='we shall see where this appears', intents=intents)
 
-list_cogs = ['cogs.ping']
+list_cogs = ['cogs.ping', 'cogs.embed_test', 'cogs.owner', 'cogs.game']
 
 
 @bot.event
@@ -40,8 +42,22 @@ async def change(ctx):
 
 
 async def main():
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.INFO)
+
+    handler = logging.handlers.RotatingFileHandler(
+        filename='discord.log',
+        encoding='utf-8',
+        maxBytes=32 * 1024 * 1024,  # 32 MiB
+        backupCount=5,  # Rotate through 5 files
+    )
+    dt_fmt = '%Y-%m-%d %H:%M:%S'
+    formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
     async with bot:
         await load()
         await bot.start(token)
+
 
 asyncio.run(main())
