@@ -17,6 +17,7 @@ class Remote_Control(commands.Cog):
         print('Game is ready.')
 
     @commands.command(name='remote', help="This command enables and disables mass remote control.")
+    @commands.has_any_role(878727109143580683, 810013892670521364, 993305944412921967)
     async def remote(self, ctx, arg):
         if arg == 'on':
             self.status = 1

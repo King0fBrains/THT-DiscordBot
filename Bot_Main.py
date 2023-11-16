@@ -13,11 +13,6 @@ bot = commands.Bot(command_prefix='.', description='we shall see where this appe
 list_cogs = ['cogs.ping', 'cogs.embed_test', 'cogs.owner', 'cogs.remote_control']
 
 
-@bot.event
-async def on_ready():
-    print(f'We have logged in as {bot.user}.')
-
-
 async def load():
     for cog in list_cogs:
         await bot.load_extension(cog)
@@ -32,6 +27,7 @@ async def hello(ctx):
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Game(name='with the API'))
+    print(f'We have logged in as {bot.user}.')
 
 
 @bot.command()
