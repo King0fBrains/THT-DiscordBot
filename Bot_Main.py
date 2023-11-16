@@ -11,7 +11,7 @@ intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='.', description='we shall see where this appears', intents=intents)
 
-list_cogs = ['cogs.ping', 'cogs.embed_test', 'cogs.owner', 'cogs.game']
+list_cogs = ['cogs.ping', 'cogs.embed_test', 'cogs.owner', 'cogs.click']
 
 
 @bot.event
