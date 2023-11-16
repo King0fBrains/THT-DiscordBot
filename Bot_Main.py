@@ -4,14 +4,13 @@ import logging
 import logging.handlers
 from discord.ext import commands
 
-file_read = open('token.txt', 'r')
-token = file_read.readline()
-
+with open('token.txt') as f:
+    token = f.readline()
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='.', description='we shall see where this appears', intents=intents)
 
-list_cogs = ['cogs.ping', 'cogs.embed_test', 'cogs.owner', 'cogs.click']
+list_cogs = ['cogs.ping', 'cogs.embed_test', 'cogs.owner', 'cogs.remote_control']
 
 
 @bot.event
