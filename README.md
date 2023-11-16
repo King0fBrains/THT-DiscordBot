@@ -1,6 +1,6 @@
+[<img src="https://canary.discordapp.com/api/guilds/807830259990659082/widget.png?style=banner2">](https://discord.gg/V9yYzugtmr)
 # THT-DiscordBot 
 In progress work for the discord bot ran in The High Table discord server. 
-[<img src="https://canary.discordapp.com/api/guilds/807830259990659082/widget.png?style=banner2">](https://discord.gg/V9yYzugtmr)
 Note: This bot is going to be hardcoded for the THT discord server. It will also be an absolute mess.
 ### Where to Find Me
 If you have any questions, please join THT and ping me in the general chat.
