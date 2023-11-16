@@ -21,3 +21,4 @@ I have to thank [@10BenAgain](https://github.com/10BenAgain) for inspiring me to
 #### Whoops
 As stated above this project is a mess. Here will be where I document all of the stupid things that have happened so far.
 - Yes there is an old bot token in the commit history. No it does not work. The bot has infact been changed since then to not require a hardcoded token. It happened when I changed the repository from private to public. Remember to check your commit history.
+
