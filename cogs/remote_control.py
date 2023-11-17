@@ -2,9 +2,13 @@ from discord.ext import commands
 import pyautogui
 
 
-class RemoteControl(commands.Cog):
+class RemoteControl(commands.Cog, description='This is a cog for the remote control commands.'):
     Keys = ['z', 'x', 'up', 'down', 'left', 'right', 'enter', 'backspace', 'a', 's']
     Roles = (878727109143580683, 810013892670521364, 993305944412921967, 1003816787181314109)
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print('Remote Control is ready.')
 
     def __init__(self, bot):
         self.bot = bot
@@ -12,8 +16,12 @@ class RemoteControl(commands.Cog):
         self.state = False
 
     @commands.command(name='remote',
-                      help="This command allows for admins/moderators to manage the remote control state.",
-                      brief="This command enables and disables mass remote control.")
+                      brief="This command allows for admins/moderators to manage the remote control state.",
+                      help="This command allows for admins/moderators to manage the remote control state.\n "
+                           "The possible arguments are *on*, *off*, *all*, *admin*, and *status*.\n "
+                           "*on* and *off* enable and disable the remote control respectively.\n "
+                           "*all* and *admin* enable the remote control for all users and admins respectively.\n "
+                           "*status* tells you whether the remote control is enabled or disabled.\n An example is shown below:\n\n `[p]remote on`")
     @commands.has_any_role(878727109143580683, 810013892670521364, 993305944412921967, 1003816787181314109)
     async def remote(self, ctx, arg):
         if arg == 'on':
@@ -29,11 +37,12 @@ class RemoteControl(commands.Cog):
             self.status = 2
             await ctx.send('Remote control enabled for admins.')
         elif arg == 'status':
-            await ctx.send(f'Remote control is currently {"enabled" if self.status == 1 else "disabled"}.')
+            await ctx.send(f'Remote control is currently {"enabled" if self.status == 1 else "disabled"}. '
+                           f'The users who have access are {"everyone" if self.status == 1 else "admins"}')
         else:
             await ctx.send('Invalid input. Please use either "on" or "off".')
 
-    @commands.command(name='press', brief="This command clicks the requested button.")
+    @commands.command(name='press', brief="This command clicks the requested button.", help= "This command clicks the requested button.\n The possible arguments are *z*, *x*, *up*, *down*, *left*, *right*, *enter*, *backspace*, *a*, and *s*.\n An example is shown below:\n\n `[p]press z`")
     async def press(self, ctx, key):
         status = self.status
         state = self.state
@@ -41,7 +50,7 @@ class RemoteControl(commands.Cog):
         roles = self.Roles
 
         if state is False:
-            await ctx.send(f"Remote state is not on")
+            await ctx.send(f"Remote control is disabled.")
         elif status == 1:
             if key in keys:
                 pyautogui.press(key, interval=0.5)
