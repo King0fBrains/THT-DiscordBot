@@ -3,6 +3,8 @@ import asyncio
 import logging
 import logging.handlers
 from discord.ext import commands
+from os import listdir
+from os.path import isfile, join
 
 with open('token.txt') as f:
     token = f.readline()
@@ -10,7 +12,7 @@ intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='.', description='we shall see where this appears', intents=intents)
 
-list_cogs = ['cogs.ping', 'cogs.embed_test', 'cogs.owner', 'cogs.remote_control']
+list_cogs = ["cogs." + f.replace('.py', '') for f in listdir('cogs') if isfile(join('cogs', f))]
 
 
 async def load():
@@ -25,12 +27,6 @@ async def on_ready():
     channel = bot.get_channel(1029842105423626250)
     await channel.send(embed=discord.Embed(title='Bot is ready.', color=discord.Color.green()))
     print(f'We have logged in as {bot.user}.')
-
-
-@bot.command()
-async def change(ctx):
-    await bot.change_presence(activity=discord.Game(name='I have now changed my status!'))
-    await ctx.send("I'm now playing with the API!")
 
 
 class MyHelp(commands.HelpCommand):
