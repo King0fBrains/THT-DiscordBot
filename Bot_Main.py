@@ -6,13 +6,14 @@ from discord.ext import commands
 import os
 from os.path import isfile, join
 from datetime import datetime
+from help import MyHelp
 
 with open('token.txt') as f:  # Get the token
     token = f.readline()
 intents = discord.Intents.all()  # Set all the intents
 
 bot = commands.Bot(command_prefix='.', description='we shall see where this appears', intents=intents)
-
+bot.help_command = MyHelp()
 list_cogs = ["cogs." + f.replace('.py', '') for f in os.listdir('cogs') if isfile(join('cogs', f))]  # Get all the cogs
 
 
@@ -41,48 +42,6 @@ async def on_command_error(ctx, error):  # If there is an error, send an embed c
         await channel.send(embed=embed)
         await ctx.send(embed=embed)
 
-
-class MyHelp(commands.HelpCommand):  # Custom Help Command
-
-    async def send_bot_help(self, mapping):
-        list_cogs1 = [bot.cogs[cog].qualified_name for cog in bot.cogs]
-        list_descriptions = [bot.cogs[cog].description for cog in bot.cogs]
-        list_cogs1 = [f'**{list_cogs1[i]}** - {list_descriptions[i]}' for i in range(len(list_cogs1))]
-        list_cogs1 = '\n'.join(list_cogs1)
-        embed = discord.Embed(title='List Of Cogs', description=list_cogs1, color=discord.Color.green())
-        await self.context.send(embed=embed)
-
-    async def send_command_help(self, command):
-        """This is triggered when !help <command> is invoked."""
-        command_help = command.help
-        name = command.name
-        embed = discord.Embed(title=name, description=command_help, color=discord.Color.red())
-        if not command.aliases == []:
-            embed.add_field(name='Aliases', value=', '.join(command.aliases), inline=False)
-        await self.context.send(embed=embed)
-
-    async def send_group_help(self, group):
-        """This is triggered when !help <group> is invoked."""
-        await self.context.send("This is the help page for a group command")
-
-    async def send_cog_help(self, cog):
-        """This is triggered when !help <cog> is invoked."""
-        commands_cog = cog.get_commands()
-        commands_cog = await self.filter_commands(commands_cog, sort=True)
-        commands_combined = []
-        for command in commands_cog:
-            commands_combined.append(f'**{command.name}** - {command.brief}')
-        commands_combined = '\n'.join(commands_combined)
-        embed = discord.Embed(title=cog.qualified_name, description=commands_combined, color=discord.Color.blue())
-        await self.context.send(embed=embed)
-
-    async def send_error_message(self, error):
-        """If there is an error, send an embed containing the error."""
-        channel = self.get_destination()  # this defaults to the command context channel
-        await channel.send(error)
-
-
-bot.help_command = MyHelp()
 
 try:  # Create the logs directory if it doesn't exist
     open('logs/discord.log', 'w').close()
