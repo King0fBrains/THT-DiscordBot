@@ -31,16 +31,16 @@ async def on_ready():  # When the bot come online
     print(f'We have logged in as {bot.user}.')
 
 
-@bot.event
-async def on_command_error(ctx, error):  # If there is an error, send an embed containing the error.
-    if isinstance(error, commands.CommandNotFound):
-        return
-    else:
-        embed = discord.Embed(title=f'Error in command **{ctx.command}**.', description=error,
-                              color=discord.Color.red())
-        channel = bot.get_channel(1029842105423626250)
-        await channel.send(embed=embed)
-        await ctx.send(embed=embed)
+# @bot.event
+# async def on_command_error(ctx, error):  # If there is an error, send an embed containing the error.
+#     if isinstance(error, commands.CommandNotFound):
+#         return
+#     else:
+#         embed = discord.Embed(title=f'Error in command **{ctx.command}**.', description=error,
+#                               color=discord.Color.red())
+#         channel = bot.get_channel(1029842105423626250)
+#         await channel.send(embed=embed)
+#         await ctx.send(embed=embed)
 
 
 try:  # Create the logs directory if it doesn't exist

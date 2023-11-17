@@ -3,7 +3,6 @@ from discord.ext import commands
 from discord.ext.commands import Cog, Command
 
 
-
 class MyHelp(commands.HelpCommand):  # Custom Help Command
 
     async def send_bot_help(self, mapping: dict[Cog, list[Command]]):
@@ -16,7 +15,8 @@ class MyHelp(commands.HelpCommand):  # Custom Help Command
         # list_cogs1 = '\n'.join(list_cogs1)
         embed = discord.Embed(title='List Of Cogs', color=discord.Color.green())
         for cog in f_mapping:
-            embed.add_field(name=cog.qualified_name, value='\n'.join([f'*{cmd.name}* - {cmd.brief}' for cmd in f_mapping[cog]]), inline=False)
+            embed.add_field(name=cog.qualified_name,
+                            value='\n'.join([f'*{cmd.name}* - {cmd.brief}' for cmd in f_mapping[cog]]), inline=False)
         await self.context.send(embed=embed)
 
     async def send_command_help(self, command):
@@ -47,5 +47,3 @@ class MyHelp(commands.HelpCommand):  # Custom Help Command
         """If there is an error, send an embed containing the error."""
         channel = self.get_destination()  # this defaults to the command context channel
         await channel.send(error)
-
-
