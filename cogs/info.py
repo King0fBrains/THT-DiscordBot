@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-class Info(commands.Cog, description='This is a cog for the ping command.'):
+class Info(commands.Cog, description='This is the home for all of the information commands.'):
     def __init__(self, bot):
         self.bot = bot
 
@@ -18,7 +18,7 @@ class Info(commands.Cog, description='This is a cog for the ping command.'):
     @commands.command(name='userinfo', brief='This command returns the user info', aliases=['ui'],
                       help='This command gives the user info. It can either be used with a mention or without any arguments.')
     async def userinfo(self, ctx, member: discord.Member = None):
-        if member == None:
+        if member is None:
             member = ctx.author
         embed = discord.Embed(title='User Info', description=f'Here is the info we retrieved about {member}',
                               color=member.color)
