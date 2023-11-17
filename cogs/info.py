@@ -21,7 +21,7 @@ class Info(commands.Cog, description='This is a cog for the ping command.'):
         if member == None:
             member = ctx.author
         embed = discord.Embed(title='User Info', description=f'Here is the info we retrieved about {member}',
-                              color=discord.Member.color())
+                              color=member.color)
         embed.add_field(name='Name', value=member.name, inline=True)
         embed.add_field(name='ID', value=member.id, inline=True)
         embed.add_field(name='Status', value=member.status, inline=True)

@@ -49,6 +49,8 @@ class MyHelp(commands.HelpCommand):
         command_help = command.help
         name = command.name
         embed = discord.Embed(title=name, description=command_help, color=discord.Color.red())
+        if not command.aliases == []:
+            embed.add_field(name='Aliases', value=', '.join(command.aliases), inline=False)
         await self.context.send(embed=embed)
 
     async def send_group_help(self, group):
