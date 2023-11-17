@@ -31,7 +31,7 @@ class Info(commands.Cog, description='This is the home for all of the informatio
         embed.set_thumbnail(url=member.display_avatar)
         await ctx.send(embed=embed)
 
-    @commands.command(name='serverinfo', brief='This command returns the server info', aliases=['si'],
+    @commands.command(name='serverinfo', brief='This command returns the server info',
                       help='This command gives the server info. It has no arguments.')
     async def serverinfo(self, ctx):
         embed = discord.Embed(title='Server Info', description=f'Here is the info we retrieved about {ctx.guild.name}',
@@ -46,7 +46,7 @@ class Info(commands.Cog, description='This is the home for all of the informatio
         embed.set_thumbnail(url=ctx.guild.icon)
         await ctx.send(embed=embed)
 
-    @commands.command(name='botinfo', brief='This command returns the bot info', aliases=['bi'],
+    @commands.command(name='botinfo', brief='This command returns the bot info',
                       help='This command gives the bot info. It has no arguments.')
     async def botinfo(self, ctx):
         x = await commands.Bot.application_info(self.bot)
