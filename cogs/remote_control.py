@@ -42,12 +42,12 @@ class RemoteControl(commands.Cog, description='This is a cog for the remote cont
         else:
             await ctx.send('Invalid input. Please use either "on" or "off".')
 
-    @commands.command(name='press', brief="This command clicks the requested button.", help= "This command clicks the requested button.\n The possible arguments are *z*, *x*, *up*, *down*, *left*, *right*, *enter*, *backspace*, *a*, and *s*.\n An example is shown below:\n\n `[p]press z`")
+    @commands.command(name='press', brief="This command clicks the requested button.",
+                      help="This command clicks the requested button.\n The possible arguments are *z*, *x*, *up*, *down*, *left*, *right*, *enter*, *backspace*, *a*, and *s*.\n An example is shown below:\n\n `[p]press z`")
     async def press(self, ctx, key):
         status = self.status
         state = self.state
         keys = self.Keys
-        roles = self.Roles
 
         if state is False:
             await ctx.send(f"Remote control is disabled.")
