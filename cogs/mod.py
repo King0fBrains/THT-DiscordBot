@@ -87,6 +87,30 @@ class Mod(commands.Cog):
             await channel.purge(limit=amount+1, check=check)
         await ctx.send(f'Deleted {amount} messages.')
 
+    @commands.command(name='role', brief='This command allows for addition/removal of roles.', help='This command allows for addition/removal of roles. It has two arguments: member and role. An example is shown below:\n\n `[p]role @member role`')
+    @commands.has_permissions(manage_roles=True)
+    async def role(self, ctx, member: discord.Member=None, role: discord.Role=None):
+        if member == ctx.author:
+            await ctx.send('You cannot add/remove roles from yourself.')
+            return
+        if member == self.bot.user:
+            await ctx.send('You cannot add/remove roles from me.')
+            return
+        if role is None:
+            await ctx.send('Please add a role.')
+            return
+        if role in member.roles:
+            await member.remove_roles(role)
+            await ctx.send(f'Removed {role} from {member}.')
+        else:
+            try:
+                await member.add_roles(role)
+                await ctx.send(f'Added {role} to {member}.')
+            except commands.errors.RoleNotFound:
+                await ctx.send('Invalid role.')
+            except commands.errors.MemberNotFound:
+                await ctx.send('Invalid member')
+
 
 async def setup(bot):
     await bot.add_cog(Mod(bot))

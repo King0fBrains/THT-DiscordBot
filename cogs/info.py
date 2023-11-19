@@ -1,14 +1,16 @@
 import discord
 from discord.ext import commands
+import datetime
 
 
 class Info(commands.Cog, description='This is the home for all of the information commands.'):
     def __init__(self, bot):
         self.bot = bot
-
+        self.time = None
     @commands.Cog.listener()
     async def on_ready(self):  # This event is called when the bot is ready
         print('Info is ready.')
+        self.time = datetime.datetime.now()
 
     @commands.command(name='ping', brief='This command returns the latency',
                       help='This command gives the latency. It has no arguments.')
@@ -58,6 +60,11 @@ class Info(commands.Cog, description='This is the home for all of the informatio
         embed.add_field(name='Member Count', value=len(ctx.bot.users), inline=True)
         embed.add_field(name='Guild Count', value=len(ctx.bot.guilds), inline=True)
         await ctx.send(embed=embed)
+
+    @commands.command(name='uptime', brief='This command returns the bot uptime', help='This command gives the bot uptime. It has no arguments.')
+    async def uptime(self, ctx):
+        difference = datetime.datetime.now() - self.time
+        await ctx.send(f'Uptime: {difference.days} days, {difference.seconds // 3600} hours, {(difference.seconds // 60) % 60} minutes, {difference.seconds % 60} seconds')
 
 
 async def setup(bot):
