@@ -58,7 +58,7 @@ class Sticky(commands.Cog, description='Keeps Messages at the bottom of the chan
         elif self.channels[self.channel_info.index(message.channel)][1] == 'raid':
             await message.channel.send(raid)
 
-    @commands.command(name='channels')
+    @commands.command(name='channels', brief="Displays channels that have a sticky message", help="Displays channels that have a sticky message")
     @commands.has_permissions(manage_messages=True)
     async def channels(self, ctx):
         embed = discord.Embed(title='Sticky Channels', description='These are the sticky channels.',
@@ -67,7 +67,10 @@ class Sticky(commands.Cog, description='Keeps Messages at the bottom of the chan
             embed.add_field(name=self.channel_info[i].name, value=f"Type - {self.channels[i][1]}", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(name='add_channel')
+    @commands.command(name='add_channel', brief="Adds a channel to the sticky channels",
+                      help="Adds a channel to the sticky channels. It has two arguments: channel and channel_type."
+                           "\nPossible channel types are *bot*, *order*, *info*, *help*, *vip*, and *raid*. An example is shown below:"
+                           "\n\n `[p]add_channel #bot bot`")
     @commands.has_permissions(manage_messages=True)
     async def add_channel(self, ctx, channel: discord.TextChannel, channel_type):
         if channel_type not in ['bot', 'order', 'info', 'help', 'vip', 'raid']:
