@@ -29,6 +29,11 @@ class Owner(commands.Cog, description='This is a cog for the owner commands.'):
         embed = discord.Embed(title='List Of Cogs', description=list_cogs, color=discord.Color.green())
         await ctx.send(embed=embed)
 
+    @commands.command(name='invite', brief='This command sends the invite link for the bot.'
+        ,help='This command sends the invite link for the bot. It has no arguments.')
+    async def invite(self, ctx):
+        await ctx.send('https://discord.com/api/oauth2/authorize?client_id=923764425436049478&permissions=8&scope=bot')
+
 
 async def setup(bot):
     await bot.add_cog(Owner(bot))

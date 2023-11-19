@@ -16,6 +16,24 @@ bot = commands.Bot(command_prefix='.', description='we shall see where this appe
 bot.help_command = MyHelp()
 list_cogs = ["cogs." + f.replace('.py', '') for f in os.listdir('cogs') if isfile(join('cogs', f))]  # Get all the cogs
 
+if not os.path.exists('configs'):  # Create the config directory if it doesn't exist
+    os.mkdir('configs')
+
+
+async def everyone_ping():
+    await bot.wait_until_ready()
+    while not bot.is_closed():
+        channel = bot.get_channel(775883912760918036)
+        await channel.send("@everyone\nDon't forget to join The High Table!\n"
+                           "We have free genning bots that run 24/7 for Scarlet/Violet, SWSH, BDSP, and PLA we also have an Animal Crossing New Horizons Bot!!!\n"
+                           "Join now and complete your shiny dex!!!\n"
+                           "Vergesst nicht dem High Table beizutreten!\n"
+                            "Wir haben kostenlose genning bots die 24/7 für Karmesin/Purpur, SWSH, BDSP, Animal Crossing New Horizon bot.\n"
+                            "Tritt jetzt bei um dir deinen Shiny dex zu komplettieren.\n"
+                            "Dies ist ein Englisch sprechender Server, trotzdem funktionieren die bots gleich.\n"
+                           "discord.gg/tht")
+        await asyncio.sleep(3600)
+
 
 async def load():  # Load all the cogs
     for cog in list_cogs:
@@ -29,22 +47,11 @@ async def on_ready():  # When the bot come online
     channel = bot.get_channel(1029842105423626250)
     await channel.send(embed=discord.Embed(title='Bot is ready.', color=discord.Color.green()))
     print(f'We have logged in as {bot.user}.')
-
-
-# @bot.event
-# async def on_command_error(ctx, error):  # If there is an error, send an embed containing the error.
-#     if isinstance(error, commands.CommandNotFound):
-#         return
-#     else:
-#         embed = discord.Embed(title=f'Error in command **{ctx.command}**.', description=error,
-#                               color=discord.Color.red())
-#         channel = bot.get_channel(1029842105423626250)
-#         await channel.send(embed=embed)
-#         await ctx.send(embed=embed)
+    bot.loop.create_task(everyone_ping())
 
 
 try:  # Create the logs directory if it doesn't exist
-    open('logs/discord.log', 'w').close()
+    open('logs/discord.log', 'r').close()
 except FileNotFoundError:
     os.mkdir('logs')
 try:  # Rename the log file if it is too large, or create the log file if it doesn't exist
@@ -57,6 +64,7 @@ try:  # Rename the log file if it is too large, or create the log file if it doe
 except FileNotFoundError:
     print('No log file found.')
     open('logs/discord.log', 'w').close()
+
 
 
 async def main():

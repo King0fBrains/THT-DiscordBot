@@ -48,9 +48,6 @@ class Mod(commands.Cog):
                       help="This command unbans a member. It has two arguments: member and reason.")
     @commands.has_permissions(ban_members=True)
     async def unban(self, ctx, member: discord.Member, *, message=None):
-        embed_dm = discord.Embed(title=f'You have been unbanned.', description=f'Reason: {message}',
-                                 colour=discord.Colour.dark_red())
-        await member.send(embed=embed_dm)
         await member.unban()
         embed = discord.Embed(title=f'Unbanned {member}', description=f'Reason: {message}',
                               colour=discord.Colour.dark_red())
@@ -77,16 +74,17 @@ class Mod(commands.Cog):
     @commands.command(name='purge', aliases=['cleanup'], brief='This command deletes messages.',
                       help='This command deletes messages.')
     @commands.has_permissions(manage_messages=True)
-    async def purge(self, ctx, channel: discord.TextChannel = None, member: discord.Member = None, amount: int = 5):
+    async def purge(self, ctx, amount: int, channel: discord.TextChannel = None, member: discord.Member = None):
         if channel is None:
             channel = ctx.channel
         if member is None:
-            await channel.purge(limit=amount)
+            await ctx.message.add_reaction('✅')
+            await channel.purge(limit=amount+1)
         else:
             def check(message):
                 return message.author == member
 
-            await channel.purge(limit=amount, check=check)
+            await channel.purge(limit=amount+1, check=check)
         await ctx.send(f'Deleted {amount} messages.')
 
 
