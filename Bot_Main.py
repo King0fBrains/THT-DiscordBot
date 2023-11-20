@@ -12,7 +12,7 @@ with open('token.txt') as f:  # Get the token
     token = f.readline()
 intents = discord.Intents.all()  # Set all the intents
 
-bot = commands.Bot(command_prefix='.', description='we shall see where this appears', intents=intents)
+bot = commands.Bot(command_prefix='-', description='we shall see where this appears', intents=intents)
 bot.help_command = MyHelp()
 list_cogs = ["cogs." + f.replace('.py', '') for f in os.listdir('cogs') if isfile(join('cogs', f))]  # Get all the cogs
 
