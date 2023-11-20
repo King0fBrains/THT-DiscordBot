@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
 import datetime
+import psutil
 
 
 class Info(commands.Cog, description='This is the home for all of the information commands.'):
     def __init__(self, bot):
         self.bot = bot
         self.time = None
+
     @commands.Cog.listener()
     async def on_ready(self):  # This event is called when the bot is ready
         print('Info is ready.')
@@ -61,10 +63,39 @@ class Info(commands.Cog, description='This is the home for all of the informatio
         embed.add_field(name='Guild Count', value=len(ctx.bot.guilds), inline=True)
         await ctx.send(embed=embed)
 
-    @commands.command(name='uptime', brief='This command returns the bot uptime', help='This command gives the bot uptime. It has no arguments.')
+    @commands.command(name='uptime', brief='This command returns the bot uptime',
+                      help='This command gives the bot uptime. It has no arguments.')
     async def uptime(self, ctx):
         difference = datetime.datetime.now() - self.time
-        await ctx.send(f'Uptime: {difference.days} days, {difference.seconds // 3600} hours, {(difference.seconds // 60) % 60} minutes, {difference.seconds % 60} seconds')
+        await ctx.send(
+            f'Uptime: {difference.days} days, {difference.seconds // 3600} hours, {(difference.seconds // 60) % 60} minutes, {difference.seconds % 60} seconds')
+
+    @commands.group()
+    async def system(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send('Invalid system command passed...')
+
+    @system.command(name='cpu', brief='This command returns the cpu usage', help='This command gives the cpu usage. It has no arguments.')
+    async def cpu(self, ctx):
+        embed = discord.Embed(title='CPU Usage', description=f'CPU Usage: {psutil.cpu_percent()}%',
+                              color=discord.Color.green())
+        await ctx.send(embed=embed)
+
+    @system.command(name='memory', brief='This command returns the memory usage', help='This command gives the memory usage. It has no arguments.')
+    async def memory(self, ctx):
+        embed = discord.Embed(title='Memory Usage', description=f'Memory Usage: {psutil.virtual_memory().percent}%',
+                              color=discord.Color.green())
+        embed.add_field(name='Total Memory', value=f'{round(psutil.virtual_memory().total / 1000000000, 2)} GB', inline=True)
+        await ctx.send(embed=embed)
+
+    @system.command(name='disk', brief='This command returns the disk usage', help='This command gives the disk usage. It has no arguments.')
+    async def disk(self, ctx):
+        embed = discord.Embed(title='Disk Usage', description=f'Disk Usage: {psutil.disk_usage("/").percent}%',
+                              color=discord.Color.green())
+        embed.add_field(name='Total Disk Space', value=f'{round(psutil.disk_usage("/").total / 1000000000, 2)} GB', inline=True)
+        await ctx.send(embed=embed)
+
+
 
 
 async def setup(bot):

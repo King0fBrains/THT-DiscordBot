@@ -28,9 +28,9 @@ async def everyone_ping():
                            "We have free genning bots that run 24/7 for Scarlet/Violet, SWSH, BDSP, and PLA we also have an Animal Crossing New Horizons Bot!!!\n"
                            "Join now and complete your shiny dex!!!\n"
                            "Vergesst nicht dem High Table beizutreten!\n"
-                            "Wir haben kostenlose genning bots die 24/7 für Karmesin/Purpur, SWSH, BDSP, Animal Crossing New Horizon bot.\n"
-                            "Tritt jetzt bei um dir deinen Shiny dex zu komplettieren.\n"
-                            "Dies ist ein Englisch sprechender Server, trotzdem funktionieren die bots gleich.\n"
+                           "Wir haben kostenlose genning bots die 24/7 für Karmesin/Purpur, SWSH, BDSP, Animal Crossing New Horizon bot.\n"
+                           "Tritt jetzt bei um dir deinen Shiny dex zu komplettieren.\n"
+                           "Dies ist ein Englisch sprechender Server, trotzdem funktionieren die bots gleich.\n"
                            "discord.gg/tht")
         await asyncio.sleep(3600)
 
@@ -64,7 +64,6 @@ try:  # Rename the log file if it is too large, or create the log file if it doe
 except FileNotFoundError:
     print('No log file found.')
     open('logs/discord.log', 'w').close()
-
 
 
 async def main():

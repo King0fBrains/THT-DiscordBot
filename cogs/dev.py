@@ -78,7 +78,7 @@ class Dev(commands.Cog):
     @commands.command(name='shell',
                       help='This command gives you shell access to the server. It has one argument, the command you want to run.',
                       brief='This command gives you shell access to the server.')
-    async def shell(self, ctx, args=None):
+    async def shell(self, ctx, *, args=None):
         if args is None:
             await ctx.send('Please enter a command.')
         else:  # https://docs.python.org/3/library/asyncio-subprocess.html
@@ -99,7 +99,15 @@ class Dev(commands.Cog):
             if stderr:
                 embed3 = discord.Embed(title='stderr', description=f'```{stderr.decode()}```',
                                        color=discord.Color.green())
-            await ctx.send(embeds=[embed1, embed2, embed3])
+            # await ctx.send(embed=embed2)
+            if embed2 is None and embed3 is None:
+                await ctx.send(embed=embed1)
+            elif embed2 is None:
+                await ctx.send(embeds=[embed1, embed3])
+            elif embed3 is None:
+                await ctx.send(embeds=[embed1, embed2])
+            else:
+                await ctx.send(embeds=[embed1, embed2, embed3])
 
 
 async def setup(bot):
