@@ -7,6 +7,9 @@ import os
 from os.path import isfile, join
 from datetime import datetime
 from help import MyHelp
+from database import create_warnings
+
+create_warnings()
 
 with open('token.txt') as f:  # Get the token
     token = f.readline()
