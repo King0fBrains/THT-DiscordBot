@@ -39,7 +39,7 @@ class Owner(commands.Cog, description='This is a cog for the owner commands.'):
         embed1 = discord.Embed(title='Small Issues', description='tags?? \ncustom embeds?',
                                color=discord.Color.green())
         embed2 = discord.Embed(title='Big Issues',
-                               description='Warnings \nRestart \nRetrigger - Add a cog that holds all of our manual retrigger things \nDefender - Add a cog that holds all of our manual defender things \nModLog \n'
+                               description='Warnings \nRestart \nRetrigger - Add a cog that holds all of our manual retrigger things \nModLog \n'
                                            'Error\n\n', color=discord.Color.orange())
         await ctx.send(embeds=[embed1, embed2])
 

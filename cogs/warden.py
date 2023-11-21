@@ -11,13 +11,17 @@ class Warden(commands.Cog, description="A home for all of our warden rules."):
     def __init__(self, bot):
         self.bot = bot
         self.bot.channels = [906739960084856832, 808182861571686430, 1029842105423626250]
-        self.regex_prefix = re.compile('\A([?,!@#$%^&*+-]t)')
+        self.staff_channel_id = 900502871156613190
         wrong_channel = Capture('.') + (Either('t', 'T') + Optional('rade'))
         pre: Pregex = \
             wrong_channel
         self.regex_wrong_channel = pre
         self.wrong_prefix = Either('?', '!', '@', '#', '$', '%', '^', '&', '*', '+', '-') + Either('t', 'T') + Optional('rade')
+        self.invite_link = re.compile(r"(discord\.(?:gg|io|me|li)|discord(?:app)?\.com\/invite)\/(\S+)", re.I)
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.staff_channel = self.bot.get_channel(self.staff_channel_id)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -35,7 +39,7 @@ class Warden(commands.Cog, description="A home for all of our warden rules."):
                                   color=discord.Color.red())
             embed.add_field(name="Message", value=message.content, inline=False)
             embed.set_footer(text=f"{message.author.mention} in {message.jump_url}")
-            await staff_channel.send(embed=embed)
+            await self.staff_channel.send(embed=embed)
             return
         if 878727109143580683 in roles or 993305944412921967 in roles or 810013892670521364 in roles:
             return
@@ -48,8 +52,22 @@ class Warden(commands.Cog, description="A home for all of our warden rules."):
                                   color=discord.Color.red())
             embed.add_field(name="Message", value=message.content, inline=False)
             embed.set_footer(text=f"{message.author.mention} in {message.jump_url}")
-            await staff_channel.send(embed=embed)
+            await self.staff_channel.send(embed=embed)
             return
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.guild.id != 720439033355829268:
+            return
+        if message.author.bot:
+            return
+        result = bool(self.invite_link.findall(message.content))
+        if result is True:
+            embed = discord.Embed(title="Anti-Invite", description=f"User {message.author.name}- {message.content} sent an invite link",
+                                  color=discord.Color.red())
+            embed.set_footer(text=f"{message.author.mention}")
+            await self.staff_channel.send(embed=embed)
+            await message.delete()
 
 
 async def setup(bot):
