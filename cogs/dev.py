@@ -110,5 +110,5 @@ class Dev(commands.Cog):
                 await ctx.send(embeds=[embed1, embed2, embed3])
 
 
-async def setup(bot):
-    await bot.add_cog(Dev(bot))
+def setup(bot):
+    bot.add_cog(Dev(bot))

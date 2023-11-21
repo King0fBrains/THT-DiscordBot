@@ -1,12 +1,11 @@
 import discord
 from discord.ext import commands
 
-
 class Owner(commands.Cog, description='This is a cog for the owner commands.'):
     def __init__(self, bot):
         self.bot = bot
 
-    async def cog_check(self, ctx):
+    async def cog_check(self):
         return commands.is_owner()
 
     @commands.Cog.listener()
@@ -42,7 +41,6 @@ class Owner(commands.Cog, description='This is a cog for the owner commands.'):
                                description='Warnings \nRestart \nRetrigger - Add a cog that holds all of our manual retrigger things \nModLog \n'
                                            'Error\n\n', color=discord.Color.orange())
         await ctx.send(embeds=[embed1, embed2])
-
-
+        
 async def setup(bot):
     await bot.add_cog(Owner(bot))

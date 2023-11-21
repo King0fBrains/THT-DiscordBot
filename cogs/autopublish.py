@@ -32,5 +32,5 @@ class AutoPublish(commands.Cog, description="Automatically publishes messages in
         await ctx.send(f'Now auto-publishing in {channel.mention}.')
 
 
-async def setup(bot):
-    await bot.add_cog(AutoPublish(bot))
+def setup(bot):
+    bot.add_cog(AutoPublish(bot))

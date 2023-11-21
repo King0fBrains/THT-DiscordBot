@@ -84,5 +84,5 @@ class Sticky(commands.Cog, description='Keeps Messages at the bottom of the chan
 
 
 
-async def setup(bot):
-    await bot.add_cog(Sticky(bot))
+def setup(bot):
+    bot.add_cog(Sticky(bot))
