@@ -61,5 +61,5 @@ class Starboard(commands.Cog, description='Allows for management of the starboar
                         await old_message.edit(content=f'⭐{reaction.count}', embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(Starboard(bot))
+async def setup(bot):
+    await bot.add_cog(Starboard(bot))

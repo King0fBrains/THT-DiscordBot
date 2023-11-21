@@ -27,5 +27,5 @@ class LinkQuote(commands.Cog, description="This cog allows for link-quoting."):
             embed.set_thumbnail(url=message_linked.author.display_avatar.url)
             await message.channel.send(embed=embed)
 
-def setup(bot):
-    bot.add_cog(LinkQuote(bot))
+async def setup(bot):
+    await bot.add_cog(LinkQuote(bot))

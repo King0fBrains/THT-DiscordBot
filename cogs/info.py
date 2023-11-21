@@ -95,5 +95,5 @@ class Info(commands.Cog, description='This is the home for all of the informatio
         embed.add_field(name='Total Disk Space', value=f'{round(psutil.disk_usage("/").total / 1000000000, 2)} GB', inline=True)
         await ctx.send(embed=embed)
 
-def setup(bot):
-    bot.add_cog(Info(bot))
+async def setup(bot):
+   await bot.add_cog(Info(bot))

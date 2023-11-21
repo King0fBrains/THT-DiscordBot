@@ -112,5 +112,5 @@ class Mod(commands.Cog):
                 await ctx.send('Invalid member')
 
 
-def setup(bot):
-    bot.add_cog(Mod(bot))
+async def setup(bot):
+    await bot.add_cog(Mod(bot))

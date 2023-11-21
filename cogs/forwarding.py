@@ -35,5 +35,5 @@ class Forwarding(commands.Cog, description='Allows for forwarding messages from 
         await ctx.message.add_reaction('✅')
 
 
-def setup(bot):
-    bot.add_cog(Forwarding(bot))
+async def setup(bot):
+    await bot.add_cog(Forwarding(bot))

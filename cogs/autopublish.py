@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 
-
 class AutoPublish(commands.Cog, description="Automatically publishes messages in the specified channels"):
     def __init__(self, bot):
         self.bot = bot
@@ -31,6 +30,5 @@ class AutoPublish(commands.Cog, description="Automatically publishes messages in
             f.write(f'{channel.id}\n')
         await ctx.send(f'Now auto-publishing in {channel.mention}.')
 
-
-def setup(bot):
-    bot.add_cog(AutoPublish(bot))
+async def setup(bot):
+    await bot.add_cog(AutoPublish(bot))

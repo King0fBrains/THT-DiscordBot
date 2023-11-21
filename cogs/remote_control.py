@@ -72,5 +72,5 @@ class RemoteControl(commands.Cog, description='This is a cog for the remote cont
                     f"Invalid input. Please use one of the following: {'%s' % ', '.join(map(str, keys))}.")
 
 
-def setup(bot):
-    bot.add_cog(RemoteControl(bot))
+async def setup(bot):
+   await bot.add_cog(RemoteControl(bot))
