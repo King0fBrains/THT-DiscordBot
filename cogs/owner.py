@@ -38,7 +38,7 @@ class Owner(commands.Cog, description='This is a cog for the owner commands.'):
 
     @commands.command()
     async def issues(self, ctx):
-        embed1 = discord.Embed(title='Small Issues', description='tags?? \ncustom embeds?',
+        embed1 = discord.Embed(title='Small Issues', description='lock/unlock \ntags?? \ncustom embeds?',
                                color=discord.Color.green())
         embed2 = discord.Embed(title='Big Issues',
                                description='Warnings \nRestart \nRetrigger - Add a cog that holds all of our manual retrigger things \nModLog \n'
