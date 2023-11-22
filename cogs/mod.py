@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 from datetime import datetime
+from mysql.connector import connect, Error
+from database import select_warnings
 
 
 class Mod(commands.Cog):
@@ -110,6 +112,67 @@ class Mod(commands.Cog):
                 await ctx.send('Invalid role.')
             except commands.errors.MemberNotFound:
                 await ctx.send('Invalid member')
+
+    @commands.command(name='warn', brief='This command warns a member.', help='This command warns a member. It has two arguments: member and reason.')
+    @commands.has_permissions(ban_members=True)
+    async def warn(self, ctx, member: discord.Member, *, message=None):
+        if message is None:
+            message = 'No reason provided.'
+        insert_warning_query = "INSERT INTO warnings (id, warning, author) VALUES (%s, %s, %s)"
+        warnings = [(member.id, message, ctx.author.name)]
+        with open("configs/mysql.txt", "r") as f:
+            configs = f.read().splitlines()
+        try:
+            with connect(
+                    host="localhost",
+                    user=configs[0],
+                    password=configs[1],
+                    database="warnings",
+            ) as connection:
+                with connection.cursor() as cursor:
+                    cursor.executemany(insert_warning_query, warnings)
+                    connection.commit()
+
+        except Error as e:
+            print(e)
+            await ctx.send('Error with the database.')
+            return
+        case = select_warnings(member.id)[-1][0]
+        embed_dm = discord.Embed(title=f'You have been warned.', description=f'Reason: {message}', colour=discord.Colour.dark_red())
+        await member.send(embed=embed_dm)
+        embed = discord.Embed(title=f'Case #{case} Warned {member}', description=f'Reason: {message}', colour=discord.Colour.dark_red())
+        time = datetime.now().strftime("%d/%m/%Y")
+        embed.set_footer(text=f'Warned by {ctx.author} at {time}')
+        await ctx.send(embed=embed)
+        channel = self.bot.get_channel(1074723158889873418)
+        await channel.send(embed=embed)
+
+
+
+    @commands.command(name='warnings', brief='This command lists all of the warnings for a member.', help='This command lists all of the warnings for a member. It has one argument: member.')
+    @commands.has_permissions(ban_members=True)
+    async def warnings(self, ctx, member: discord.Member):
+        ID = member.id
+        select_warnings_query = (f"SELECT * FROM warnings WHERE id = {ID};")
+        with open("configs/mysql.txt", "r") as f:
+            configs = f.read().splitlines()
+        try:
+            with connect(
+                    host="localhost",
+                    user=configs[0],
+                    password=configs[1],
+                    database="warnings",
+            ) as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(select_warnings_query)
+                    embed = discord.Embed(title=f'Warnings for {member}', colour=discord.Colour.dark_red())
+                    for warning in cursor:
+                        embed.add_field(name=f'Case #{warning[0]}', value=f'{warning[2]}', inline=False)
+                        embed.set_footer(text=f'Warned by {warning[3]}')
+                    await ctx.send(embed=embed)
+        except Error as e:
+            print(e)
+            await ctx.send('Error with the database.')
 
 
 async def setup(bot):
