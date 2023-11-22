@@ -87,6 +87,7 @@ async def load():  # Load all the cogs
 async def on_ready():  # When the bot come online
     log.info(f"Successfully logged in as {bot.user}")
     bot.loop.create_task(everyone_ping())
+    await bot.change_presence(activity=discord.Game(name=config['bot']['status']))
 
 try:  # Create the logs directory if it doesn't exist
     open('logs/discord.log', 'r').close()
