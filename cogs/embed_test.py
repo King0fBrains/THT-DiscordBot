@@ -17,6 +17,5 @@ class Embed(commands.Cog, description='This is a home for all of the embed comma
         embed.set_image(url=ctx.author.avatar.url)
         await ctx.send(embed=embed)
 
-
 async def setup(bot):
     await bot.add_cog(Embed(bot))
