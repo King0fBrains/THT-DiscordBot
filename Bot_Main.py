@@ -12,9 +12,6 @@ from datetime import datetime
 from help import MyHelp
 from database import create_warnings
 
-create_warnings()
-
-
 def get_logger():
     logger = logging.getLogger('discord')
     logger.setLevel(logging.INFO)
@@ -36,6 +33,13 @@ def get_logger():
 if __name__ == "__main__":
     log = get_logger()
     log.info("Starting main bot loop")
+    
+    try:
+        create_db()
+        create_warnings()
+    except Exception as e:
+        log.error(e)
+        sys.exit(0)
     
     try:
         with open("config.json") as c:
