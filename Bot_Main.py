@@ -54,7 +54,8 @@ if __name__ == "__main__":
 async def everyone_ping():
     await bot.wait_until_ready()
     while not bot.is_closed():
-        if discord.Guild.id == 720439033355829268:
+        servers = [guild.id for guild in bot.guilds]
+        if 720439033355829268 in servers:
             channel = bot.get_channel(775883912760918036)
             await channel.send("@everyone\nDon't forget to join The High Table!\n"
                             "We have free genning bots that run 24/7 for Scarlet/Violet, SWSH, BDSP, and PLA we also have an Animal Crossing New Horizons Bot!!!\n"
@@ -101,5 +102,4 @@ async def main():
         await load()
         log.info("Successfully loaded extensions.")
         await bot.start(config['token'])
-
 asyncio.run(main())

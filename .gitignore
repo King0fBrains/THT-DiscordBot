@@ -134,3 +134,4 @@ dmypy.json
 configs/
 logs/
 /config.json
+/config.json.empty
