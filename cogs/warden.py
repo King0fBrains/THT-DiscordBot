@@ -80,7 +80,7 @@ class Warden(commands.Cog, description="A home for all of our warden rules."):
         await asyncio.sleep(5)
         try:
             await message.delete()
-        except commands.MessageNotFound:
+        except discord.errors.NotFound:
             pass
 
 async def setup(bot):
