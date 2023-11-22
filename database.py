@@ -5,12 +5,42 @@ from mysql.connector import connect, Error
 
 log = logging.getLogger('discord')
 
-def show_databases(database_connection):
-    show_db_query = "SHOW DATABASES"
-    with database_connection.cursor() as cursor:
-        cursor.execute(show_db_query)
-        for db in cursor:
-            print(db)
+def show_databases():
+    c = open_config()
+    show_databases_query = "SHOW DATABASES"
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+        ) as connection:
+            print(connection)
+            with connection.cursor() as cursor:
+                cursor.execute(show_databases_query)
+                for database in cursor:
+                    print(database)
+    except Error as e:
+        log.info(e)
+
+def show_tables():
+    c = open_config()
+    show_tables_query = "SHOW TABLES"
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
+            print(connection)
+            with connection.cursor() as cursor:
+                cursor.execute(show_tables_query)
+                for table in cursor:
+                    print(table)
+    except Error as e:
+        log.info(e)
+
+
 
 def open_config():
     try:
@@ -49,15 +79,32 @@ def create_warnings():
                 host="localhost",
                 user=c['database']['user'],
                 password=c['database']['password'],
-                database="warnings",
+                database=c['database']['database'],
         ) as connection:
             with connection.cursor() as cursor:
                 cursor.execute(create_warnings_query)
                 connection.commit()
     except Error as e:
-        log(e)
+        log.info(e)
         
-
+def insert_warning(id, warning, author):
+    c = open_config()
+    insert_warning_query = "INSERT INTO warnings (id, warning, author) VALUES (%s, %s, %s)"
+    warnings = [(id, warning, author)]
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
+            with connection.cursor() as cursor:
+                cursor.executemany(insert_warning_query, warnings)
+                connection.commit()
+        return True
+    except Error as e:
+        log.info(e)
+        return False
 
 def clear_warnings():
     c = open_config()
@@ -68,14 +115,30 @@ def clear_warnings():
                 host="localhost",
                 user=c['database']['user'],
                 password=c['database']['password'],
-                database="warnings",
+                database=c['database']['database'],
         ) as connection:
             print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(drop_table_query)
                 connection.commit()
     except Error as e:
-        log(e)
+        log.info(e)
+
+def drop_db():
+    c = open_config()
+    drop_db_query = "DROP DATABASE warnings"
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+        ) as connection:
+            print(connection)
+            with connection.cursor() as cursor:
+                cursor.execute(drop_db_query)
+                connection.commit()
+    except Error as e:
+        log.info(e)
 
 def select_warnings(ID):
     c = open_config()
@@ -85,7 +148,7 @@ def select_warnings(ID):
                 host="localhost",
                 user=c['database']['user'],
                 password=c['database']['password'],
-                database="warnings",
+                database=c['database']['database'],
         ) as connection:
             print(connection)
             with connection.cursor() as cursor:
@@ -95,7 +158,7 @@ def select_warnings(ID):
                     warnings.append(warning)
                 return warnings
     except Error as e:
-        log(e)
+        log.info(e)
         return
     
 def create_db():
@@ -106,8 +169,8 @@ def create_db():
             user=c['database']['user'],
             password=c['database']['password'],
         ) as connection:
-            create_db_query = "CREATE DATABASE IF NOT EXISTS warnings"
+            create_db_query = "CREATE DATABASE IF NOT EXISTS cynda"
             with connection.cursor() as cursor:
                 cursor.execute(create_db_query)
     except Error as e:
-        log(e)
+        log.info(e)

@@ -1,14 +1,16 @@
 import discord
 from discord.ext import commands
+import logging
 from datetime import datetime
 from mysql.connector import connect, Error
-from database import select_warnings
+from database import select_warnings, open_config, insert_warning
 
 
 class Mod(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.invite = 'https://discord.gg/V9yYzugtmr'
+        self.log = logging.getLogger('discord')
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -118,23 +120,7 @@ class Mod(commands.Cog):
     async def warn(self, ctx, member: discord.Member, *, message=None):
         if message is None:
             message = 'No reason provided.'
-        insert_warning_query = "INSERT INTO warnings (id, warning, author) VALUES (%s, %s, %s)"
-        warnings = [(member.id, message, ctx.author.name)]
-        with open("configs/mysql.txt", "r") as f:
-            configs = f.read().splitlines()
-        try:
-            with connect(
-                    host="localhost",
-                    user=configs[0],
-                    password=configs[1],
-                    database="warnings",
-            ) as connection:
-                with connection.cursor() as cursor:
-                    cursor.executemany(insert_warning_query, warnings)
-                    connection.commit()
-
-        except Error as e:
-            print(e)
+        if not insert_warning(member.id, message, ctx.author.name):
             await ctx.send('Error with the database.')
             return
         case = select_warnings(member.id)[-1][0]
@@ -154,14 +140,13 @@ class Mod(commands.Cog):
     async def warnings(self, ctx, member: discord.Member):
         ID = member.id
         select_warnings_query = (f"SELECT * FROM warnings WHERE id = {ID};")
-        with open("configs/mysql.txt", "r") as f:
-            configs = f.read().splitlines()
         try:
+            c = open_config()
             with connect(
                     host="localhost",
-                    user=configs[0],
-                    password=configs[1],
-                    database="warnings",
+                    user=c['database']['user'],
+                    password=c['database']['password'],
+                    database=c['database']['database'],
             ) as connection:
                 with connection.cursor() as cursor:
                     cursor.execute(select_warnings_query)
@@ -171,7 +156,7 @@ class Mod(commands.Cog):
                         embed.set_footer(text=f'Warned by {warning[3]}')
                     await ctx.send(embed=embed)
         except Error as e:
-            print(e)
+            self.log.info(e)
             await ctx.send('Error with the database.')
 
 
