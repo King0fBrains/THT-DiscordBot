@@ -69,6 +69,5 @@ class Warden(commands.Cog, description="A home for all of our warden rules."):
             await self.staff_channel.send(embed=embed)
             await message.delete()
 
-
 async def setup(bot):
-    await bot.add_cog(Warden(bot))
+     await bot.add_cog(Warden(bot))

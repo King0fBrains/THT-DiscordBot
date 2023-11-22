@@ -73,4 +73,4 @@ class RemoteControl(commands.Cog, description='This is a cog for the remote cont
 
 
 async def setup(bot):
-    await bot.add_cog(RemoteControl(bot))
+   await bot.add_cog(RemoteControl(bot))

@@ -82,7 +82,5 @@ class Sticky(commands.Cog, description='Keeps Messages at the bottom of the chan
             f.write(f'{channel.id} {channel_type}\n')
         await ctx.send(f'Added {channel.name} to the sticky channels.')
 
-
-
 async def setup(bot):
     await bot.add_cog(Sticky(bot))
