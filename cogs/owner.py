@@ -67,6 +67,9 @@ class Owner(commands.Cog, description='This is a cog for the owner commands.'):
             
     @commands.command()
     async def unload(self, ctx, cog):
+        if cog == "owner":
+            await ctx.send("Unable to unload owner cog.")
+            return
         input = "cogs." + cog
         try:
             await self.bot.unload_extension(input)
