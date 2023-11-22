@@ -8,6 +8,7 @@
     {
         "host": "localhost",
         "user": "",
-        "password": ""
+        "password": "",
+        "database": ""
     }
 }
