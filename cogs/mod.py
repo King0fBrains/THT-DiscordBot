@@ -2,8 +2,7 @@ import discord
 from discord.ext import commands
 import logging
 from datetime import datetime
-from mysql.connector import connect, Error
-from database import select_warnings, insert_warning, clear_warn
+from database import select_warning, insert_warning, clear_warn, insert_ban, insert_kick, select_modlog
 
 
 class Mod(commands.Cog):
@@ -11,42 +10,56 @@ class Mod(commands.Cog):
         self.bot = bot
         self.invite = 'https://discord.gg/V9yYzugtmr'
         self.log = logging.getLogger('discord')
+        self.modlog_channel = 1074723158889873418
+        self.modlog = None
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Mod is ready.')
+        self.modlog = self.bot.get_channel(self.modlog_channel)
 
     @commands.command(name="kick", brief="This command kicks a member.",
                       help="This command kicks a member. It has two arguments: member and reason.")
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, message=None):
+        if message is None:
+            message = 'No reason provided.'
         embed_dm = discord.Embed(title=f'You have been kicked. Please rejoin at {self.invite}',
                                  description=f'Reason: {message}', colour=discord.Colour.dark_red())
         await member.send(embed=embed_dm)
         await member.kick()
-        embed = discord.Embed(title=f'Kicked {member}', description=f'Reason: {message}',
+        if not insert_kick(member.id, message, ctx.author.name):
+            await ctx.send('Error with the database.')
+            return
+        case = select_modlog(member.id)[-1][0]
+
+        embed = discord.Embed(title=f'Case #{case} Kicked {member}', description=f'Reason: {message}',
                               colour=discord.Colour.dark_red())
         time = datetime.now().strftime("%d/%m/%Y")
         embed.set_footer(text=f'Kicked by {ctx.author} at {time}')
         await ctx.send(embed=embed)
-        channel = self.bot.get_channel(1074723158889873418)
-        await channel.send(embed=embed)
+        await self.modlog.send(embed=embed)
 
     @commands.command(name="ban", brief="This command bans a member.",
                       help="This command bans a member. It has two arguments: member and reason.")
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: discord.Member, *, message=None):
+        if message is None:
+            message = 'No reason provided.'
         embed_dm = discord.Embed(title=f'You have been banned.', description=f'Reason: {message}',
                                  colour=discord.Colour.dark_red())
+        ban = insert_ban(member.id, message, ctx.author.name)
+        case = select_modlog(member.id)[-1][0]
+        if not ban:
+            await ctx.send('Error with the database.')
+            return
         await member.send(embed=embed_dm)
         await member.ban()
-        embed = discord.Embed(title=f'Banned {member}', description=f'Reason: {message}',
+        embed = discord.Embed(title=f'Case #{case} Banned {member}', description=f'Reason: {message}',
                               colour=discord.Colour.dark_red())
         time = datetime.now().strftime("%d/%m/%Y")
         embed.set_footer(text=f'Banned by {ctx.author} at {time}')
         await ctx.send(embed=embed)
-        channel = self.bot.get_channel(1074723158889873418)
-        await channel.send(embed=embed)
+        await self.modlog.send(embed=embed)
 
     @commands.command(name="unban", brief="This command unbans a member.",
                       help="This command unbans a member. It has two arguments: member and reason.")
@@ -120,10 +133,8 @@ class Mod(commands.Cog):
     async def warn(self, ctx, member: discord.Member, *, message=None):
         if message is None:
             message = 'No reason provided.'
-        if not insert_warning(member.id, message, ctx.author.name):
-            await ctx.send('Error with the database.')
-            return
-        case = select_warnings(member.id)[-1][0]
+        insert_warning(member.id, message, ctx.author.name)
+        case = select_warning(member.id)[-1][0]
         embed_dm = discord.Embed(title=f'You have been warned.', description=f'Reason: {message}', colour=discord.Colour.dark_red())
         await member.send(embed=embed_dm)
         embed = discord.Embed(title=f'Case #{case} Warned {member}', description=f'Reason: {message}', colour=discord.Colour.dark_red())
@@ -138,7 +149,7 @@ class Mod(commands.Cog):
     @commands.command(name='warnings', brief='This command lists all of the warnings for a member.', help='This command lists all of the warnings for a member. It has one argument: member.')
     @commands.has_permissions(ban_members=True)
     async def warnings(self, ctx, member: discord.Member):
-        warnings = select_warnings(member.id)
+        warnings = select_warning(member.id)
         if len(warnings) == 0:
             await ctx.send('No warnings found.')
             return
@@ -150,7 +161,7 @@ class Mod(commands.Cog):
     @commands.command(name='clearwarn', brief='This command clears a warnings for a member.', help='This command clears a warnings from a member. It has two arguments: member and case #.')
     @commands.has_permissions(ban_members=True)
     async def clearwarn(self, ctx, member: discord.Member, case: int):
-        warnings = select_warnings(member.id)
+        warnings = select_warning(member.id)
         for warn in warnings:
             if warn[0] == case:
                 clear_warn(case)
@@ -160,5 +171,17 @@ class Mod(commands.Cog):
         await ctx.send(embed=embed)
         channel = self.bot.get_channel(1074723158889873418)
         await channel.send(embed=embed)
+
+    @commands.command(name='cases', brief='This command lists all of the cases for a member.', help='This command lists all of the cases for a member. It has one argument: member.')
+    @commands.has_permissions(ban_members=True)
+    async def cases(self, ctx, member: discord.Member):
+        cases = select_modlog(member.id)
+        if len(cases) == 0:
+            await ctx.send('No cases found.')
+            return
+        embed = discord.Embed(title=f'Cases for {member}', colour=discord.Colour.dark_red())
+        for case in cases:
+            embed.add_field(name=f'Case #{case[0]} - {case[4]}', value=f'{case[2]} - By {case[3]}', inline=False)
+        await ctx.send(embed=embed)
 async def setup(bot):
     await bot.add_cog(Mod(bot))

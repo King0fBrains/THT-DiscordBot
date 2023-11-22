@@ -15,7 +15,6 @@ def show_databases():
                 user=c['database']['user'],
                 password=c['database']['password'],
         ) as connection:
-            print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(show_databases_query)
                 for database in cursor:
@@ -34,7 +33,6 @@ def show_tables():
                 password=c['database']['password'],
                 database=c['database']['database'],
         ) as connection:
-            print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(show_tables_query)
                 for table in cursor:
@@ -93,7 +91,7 @@ def create_modlog():
 def insert_warning(id, warning, author):
     c = open_config()
     insert_warning_query = "INSERT INTO modlog (id, warning, author, type) VALUES (%s, %s, %s, %s)"
-    warnings = [(id, warning, author, 'warning')]
+    warnings = [(id, warning, author, 'Warning')]
     try:
         with connect(
                 host="localhost",
@@ -121,7 +119,6 @@ def clear_warnings():
                 password=c['database']['password'],
                 database=c['database']['database'],
         ) as connection:
-            print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(drop_table_query)
                 connection.commit()
@@ -139,17 +136,15 @@ def drop_db():
                 user=c['database']['user'],
                 password=c['database']['password'],
         ) as connection:
-            print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(drop_db_query)
                 connection.commit()
     except Error as e:
         log.info(e)
 
-
-def select_warnings(ID):
+def drop_modlog():
     c = open_config()
-    select_warnings_query = (f"SELECT * FROM modlog WHERE id = {ID} AND type ='warning';")
+    drop_modlog_query = "DROP TABLE modlog"
     try:
         with connect(
                 host="localhost",
@@ -157,7 +152,22 @@ def select_warnings(ID):
                 password=c['database']['password'],
                 database=c['database']['database'],
         ) as connection:
-            print(connection)
+            with connection.cursor() as cursor:
+                cursor.execute(drop_modlog_query)
+                connection.commit()
+    except Error as e:
+        log.info(e)
+
+def select_warning(ID):
+    c = open_config()
+    select_warnings_query = f"SELECT * FROM modlog WHERE id = {ID} AND type = 'warning';"
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
             with connection.cursor() as cursor:
                 cursor.execute(select_warnings_query)
                 warnings = []
@@ -171,7 +181,7 @@ def select_warnings(ID):
 
 def clear_warn(case):
     c = open_config()
-    clear_warn_query = (f"DELETE FROM warnings WHERE warnings_number = {case};")
+    clear_warn_query = (f"DELETE FROM modlog WHERE warnings_number = {case} AND type = 'warning';")
     try:
         with connect(
                 host="localhost",
@@ -179,7 +189,6 @@ def clear_warn(case):
                 password=c['database']['password'],
                 database=c['database']['database'],
         ) as connection:
-            print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(clear_warn_query)
                 connection.commit()
@@ -202,10 +211,10 @@ def create_db():
         log.info(e)
 
 
-def create_ban(id, reason, author):
+def insert_ban(id, reason, author):
     c = open_config()
     create_ban_query = "INSERT INTO modlog (id, warning, author, type) VALUES (%s, %s, %s, %s)"
-    ban = [(id, reason, author, 'ban')]
+    ban = [(id, reason, author, 'Ban')]
     try:
         with connect(
                 host="localhost",
@@ -220,3 +229,63 @@ def create_ban(id, reason, author):
     except Error as e:
         log.info(e)
         return False
+
+def insert_kick(id, reason, author):
+    c = open_config()
+    create_kick_query = "INSERT INTO modlog (id, warning, author, type) VALUES (%s, %s, %s, %s)"
+    kick = [(id, reason, author, 'Kick')]
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
+            with connection.cursor() as cursor:
+                cursor.executemany(create_kick_query, kick)
+                connection.commit()
+        return True
+    except Error as e:
+        log.info(e)
+        return False
+
+def read_modlog():
+    c = open_config()
+    read_modlog_query = "SELECT * FROM modlog "
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(read_modlog_query)
+                warnings = []
+                for warning in cursor:
+                    warnings.append(warning)
+                print(warnings)
+                return warnings
+    except Error as e:
+        log.info(e)
+        return
+
+def select_modlog(ID):
+    c = open_config()
+    select_modlog_query = f"SELECT * FROM modlog WHERE id = {ID};"
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(select_modlog_query)
+                cases = []
+                for warning in cursor:
+                    cases.append(warning)
+                return cases
+    except Error as e:
+        log.info(e)
+        return
