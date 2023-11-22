@@ -21,39 +21,24 @@ def describe_table(database_connection):
             print(column)
 
 
-create_warnings_query = """
-CREATE TABLE IF NOT EXISTS warnings (
-    warnings_number INT AUTO_INCREMENT PRIMARY KEY,
-    id BIGINT,
-    warning VARCHAR(255) NOT NULL
-)
-"""
+
 select_warnings_query = ("SELECT * FROM warnings WHERE id = 810965365491892285;")
 insert_warning_query = "INSERT INTO warnings (id, warning) VALUES (%s, %s)"
 warnings = [(810965365491892285, "This is a test warning")]
 show_table_query = "DESCRIBE warnings"
-try:
-    with connect(
-            host="localhost",
-            user=configs[0],
-            password=configs[1],
-            database="warnings",
-    ) as connection:
-        print(connection)
-        with connection.cursor() as cursor:
-            cursor.execute(show_table_query)
-            result = cursor.fetchall()
-            for row in result:
-                print(row)
-#
-
-except Error as e:
-    print(e)
 
 
 def create_warnings():
     with open("configs/mysql.txt", "r") as f:
         configs = f.read().splitlines()
+        create_warnings_query = """
+        CREATE TABLE IF NOT EXISTS warnings (
+            warnings_number INT AUTO_INCREMENT PRIMARY KEY,
+            id BIGINT,
+            warning VARCHAR(255) NOT NULL,
+            author VARCHAR(255) NOT NULL
+        )
+        """
     try:
         with connect(
                 host="localhost",
@@ -61,7 +46,6 @@ def create_warnings():
                 password=configs[1],
                 database="warnings",
         ) as connection:
-            print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(create_warnings_query)
                 connection.commit()
@@ -88,22 +72,6 @@ def clear_warnings():
     except Error as e:
         print(e)
 
-
-def add_warning():
-    try:
-        with connect(
-                host="localhost",
-                user=configs[0],
-                password=configs[1],
-                database="warnings",
-        ) as connection:
-            print(connection)
-            with connection.cursor() as cursor:
-                cursor.executemany(insert_warning_query, warnings)
-                connection.commit()
-    except Error as e:
-        print(e)
-
 def select_warnings(ID):
     select_warnings_query = (f"SELECT * FROM warnings WHERE id = {ID};")
     try:
@@ -116,19 +84,22 @@ def select_warnings(ID):
             print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(select_warnings_query)
+                warnings =[]
                 for warning in cursor:
-                    print(warning)
+                    warnings.append(warning)
+                return warnings
     except Error as e:
         print(e)
-select_warnings(810965365491892285)
-"""
-# cursor.execute(create_warnings_query)
-# connection.commit()
-
-show_table_query = "DESCRIBE warnings"
-with connection.cursor() as cursor:
-cursor.execute(show_table_query)
-result = cursor.fetchall()
-for row in result:
-    print(row)
-"""
+        return
+def create_db():
+    try:
+        with connect(
+            host="localhost",
+            user=configs[0],
+            password=configs[1],
+        ) as connection:
+            create_db_query = "CREATE DATABASE IF NOT EXISTS warnings"
+            with connection.cursor() as cursor:
+                cursor.execute(create_db_query)
+    except Error as e:
+        print(e)
