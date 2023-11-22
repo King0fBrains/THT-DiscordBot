@@ -10,7 +10,7 @@ from discord.ext import commands
 from os.path import isfile, join
 from datetime import datetime
 from help import MyHelp
-from database import create_warnings, create_db
+from database import create_modlog, create_db
 
 def get_logger():
     logger = logging.getLogger('discord')
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     
     try:
         create_db()
-        create_warnings()
+        create_modlog()
     except Exception as e:
         log.error(e)
         sys.exit(0)

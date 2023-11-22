@@ -3,7 +3,7 @@ from discord.ext import commands
 import logging
 from datetime import datetime
 from mysql.connector import connect, Error
-from database import select_warnings, open_config, insert_warning
+from database import select_warnings, insert_warning, clear_warn
 
 
 class Mod(commands.Cog):
@@ -138,27 +138,27 @@ class Mod(commands.Cog):
     @commands.command(name='warnings', brief='This command lists all of the warnings for a member.', help='This command lists all of the warnings for a member. It has one argument: member.')
     @commands.has_permissions(ban_members=True)
     async def warnings(self, ctx, member: discord.Member):
-        ID = member.id
-        select_warnings_query = (f"SELECT * FROM warnings WHERE id = {ID};")
-        try:
-            c = open_config()
-            with connect(
-                    host="localhost",
-                    user=c['database']['user'],
-                    password=c['database']['password'],
-                    database=c['database']['database'],
-            ) as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(select_warnings_query)
-                    embed = discord.Embed(title=f'Warnings for {member}', colour=discord.Colour.dark_red())
-                    for warning in cursor:
-                        embed.add_field(name=f'Case #{warning[0]}', value=f'{warning[2]}', inline=False)
-                        embed.set_footer(text=f'Warned by {warning[3]}')
-                    await ctx.send(embed=embed)
-        except Error as e:
-            self.log.info(e)
-            await ctx.send('Error with the database.')
+        warnings = select_warnings(member.id)
+        if len(warnings) == 0:
+            await ctx.send('No warnings found.')
+            return
+        embed = discord.Embed(title=f'Warnings for {member}', colour=discord.Colour.dark_red())
+        for warning in warnings:
+            embed.add_field(name=f'Case #{warning[0]}', value=f'{warning[2]} - By {warning[3]}', inline=False)
+        await ctx.send(embed=embed)
 
-
+    @commands.command(name='clearwarn', brief='This command clears a warnings for a member.', help='This command clears a warnings from a member. It has two arguments: member and case #.')
+    @commands.has_permissions(ban_members=True)
+    async def clearwarn(self, ctx, member: discord.Member, case: int):
+        warnings = select_warnings(member.id)
+        for warn in warnings:
+            if warn[0] == case:
+                clear_warn(case)
+                break
+        embed = discord.Embed(title=f'Cleared warning for {member}', colour=discord.Colour.dark_red())
+        embed.add_field(name=f'Case #{case}', value=f'{warnings[case-1][2]} - By {warnings[case-1][3]}', inline=False)
+        await ctx.send(embed=embed)
+        channel = self.bot.get_channel(1074723158889873418)
+        await channel.send(embed=embed)
 async def setup(bot):
     await bot.add_cog(Mod(bot))

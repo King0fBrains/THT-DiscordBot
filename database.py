@@ -5,6 +5,7 @@ from mysql.connector import connect, Error
 
 log = logging.getLogger('discord')
 
+
 def show_databases():
     c = open_config()
     show_databases_query = "SHOW DATABASES"
@@ -21,6 +22,7 @@ def show_databases():
                     print(database)
     except Error as e:
         log.info(e)
+
 
 def show_tables():
     c = open_config()
@@ -41,7 +43,6 @@ def show_tables():
         log.info(e)
 
 
-
 def open_config():
     try:
         with open("config.json") as c:
@@ -49,7 +50,8 @@ def open_config():
     except FileNotFoundError as error:
         log.error(error)
     return config
-        
+
+
 def describe_table(database_connection):
     describe_table_query = "DESCRIBE warnings"
     with database_connection.cursor() as cursor:
@@ -58,20 +60,20 @@ def describe_table(database_connection):
             print(column)
 
 
-select_warnings_query = ("SELECT * FROM warnings WHERE id = 810965365491892285;")
-insert_warning_query = "INSERT INTO warnings (id, warning) VALUES (%s, %s)"
+select_warnings_query = ("SELECT * FROM modlog WHERE id = 810965365491892285;")
 warnings = [(810965365491892285, "This is a test warning")]
 show_table_query = "DESCRIBE warnings"
 
 
-def create_warnings():
+def create_modlog():
     c = open_config()
     create_warnings_query = """
-        CREATE TABLE IF NOT EXISTS warnings (
+        CREATE TABLE IF NOT EXISTS modlog (
             warnings_number INT AUTO_INCREMENT PRIMARY KEY,
             id BIGINT,
             warning VARCHAR(255) NOT NULL,
-            author VARCHAR(255) NOT NULL
+            author VARCHAR(255) NOT NULL,
+            type VARCHAR(255) NOT NULL
         )
         """
     try:
@@ -86,11 +88,12 @@ def create_warnings():
                 connection.commit()
     except Error as e:
         log.info(e)
-        
+
+
 def insert_warning(id, warning, author):
     c = open_config()
-    insert_warning_query = "INSERT INTO warnings (id, warning, author) VALUES (%s, %s, %s)"
-    warnings = [(id, warning, author)]
+    insert_warning_query = "INSERT INTO modlog (id, warning, author, type) VALUES (%s, %s, %s, %s)"
+    warnings = [(id, warning, author, 'warning')]
     try:
         with connect(
                 host="localhost",
@@ -105,6 +108,7 @@ def insert_warning(id, warning, author):
     except Error as e:
         log.info(e)
         return False
+
 
 def clear_warnings():
     c = open_config()
@@ -124,9 +128,11 @@ def clear_warnings():
     except Error as e:
         log.info(e)
 
+
 def drop_db():
     c = open_config()
-    drop_db_query = "DROP DATABASE warnings"
+    database = c['database']['database']
+    drop_db_query = f"DROP DATABASE {database}"
     try:
         with connect(
                 host="localhost",
@@ -140,9 +146,10 @@ def drop_db():
     except Error as e:
         log.info(e)
 
+
 def select_warnings(ID):
     c = open_config()
-    select_warnings_query = (f"SELECT * FROM warnings WHERE id = {ID};")
+    select_warnings_query = (f"SELECT * FROM modlog WHERE id = {ID} AND type ='warning';")
     try:
         with connect(
                 host="localhost",
@@ -153,24 +160,63 @@ def select_warnings(ID):
             print(connection)
             with connection.cursor() as cursor:
                 cursor.execute(select_warnings_query)
-                warnings =[]
+                warnings = []
                 for warning in cursor:
                     warnings.append(warning)
                 return warnings
     except Error as e:
         log.info(e)
         return
-    
+
+
+def clear_warn(case):
+    c = open_config()
+    clear_warn_query = (f"DELETE FROM warnings WHERE warnings_number = {case};")
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
+            print(connection)
+            with connection.cursor() as cursor:
+                cursor.execute(clear_warn_query)
+                connection.commit()
+    except Error as e:
+        log.info(e)
+
+
 def create_db():
     c = open_config()
     try:
         with connect(
-            host="localhost",
-            user=c['database']['user'],
-            password=c['database']['password'],
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
         ) as connection:
             create_db_query = "CREATE DATABASE IF NOT EXISTS cynda"
             with connection.cursor() as cursor:
                 cursor.execute(create_db_query)
     except Error as e:
         log.info(e)
+
+
+def create_ban(id, reason, author):
+    c = open_config()
+    create_ban_query = "INSERT INTO modlog (id, warning, author, type) VALUES (%s, %s, %s, %s)"
+    ban = [(id, reason, author, 'ban')]
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
+            with connection.cursor() as cursor:
+                cursor.executemany(create_ban_query, ban)
+                connection.commit()
+        return True
+    except Error as e:
+        log.info(e)
+        return False
