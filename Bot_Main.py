@@ -10,6 +10,7 @@ from discord.ext import commands
 from os.path import isfile, join
 from datetime import datetime
 from help import MyHelp
+from database import create_db
 from database import create_warnings
 
 def get_logger():
@@ -20,7 +21,6 @@ def get_logger():
     handler = logging.handlers.RotatingFileHandler(
         filename=log_dir + '/discord.log',
         encoding='utf-8',
-        maxBytes=32 * 1024 * 1024,  # 32 MiB
         backupCount=5,  # Rotate through 5 files
     )
     
@@ -46,7 +46,7 @@ if __name__ == "__main__":
             config = json.load(c)
             intents = discord.Intents.all()
             intents.members = True
-            bot = commands.Bot(command_prefix=config['prefix'], intents=intents)
+            bot = commands.Bot(command_prefix=config['bot']['prefix'], intents=intents)
             bot.help_command = MyHelp()
     except FileNotFoundError:
         log.critical("No config file found. Please makes sure 'config.json' is in your active directory")
@@ -108,5 +108,5 @@ async def main():
     async with bot:
         await load()
         log.info("Successfully loaded extensions.")
-        await bot.start(config['token'])
+        await bot.start(config['bot']['token'])
 asyncio.run(main())

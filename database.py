@@ -1,5 +1,9 @@
+import json
+import logging
+
 from mysql.connector import connect, Error
 
+log = logging.getLogger('discord')
 
 def show_databases(database_connection):
     show_db_query = "SHOW DATABASES"
@@ -8,18 +12,20 @@ def show_databases(database_connection):
         for db in cursor:
             print(db)
 
-
-with open("configs/mysql.txt", "r") as f:
-    configs = f.read().splitlines()
-
-
+def open_config():
+    try:
+        with open("config.json") as c:
+            config = json.load(c)
+    except FileNotFoundError as error:
+        log.error(error)
+    return config
+        
 def describe_table(database_connection):
     describe_table_query = "DESCRIBE warnings"
     with database_connection.cursor() as cursor:
         cursor.execute(describe_table_query)
         for column in cursor:
             print(column)
-
 
 
 select_warnings_query = ("SELECT * FROM warnings WHERE id = 810965365491892285;")
@@ -29,9 +35,8 @@ show_table_query = "DESCRIBE warnings"
 
 
 def create_warnings():
-    with open("configs/mysql.txt", "r") as f:
-        configs = f.read().splitlines()
-        create_warnings_query = """
+    c = open_config()
+    create_warnings_query = """
         CREATE TABLE IF NOT EXISTS warnings (
             warnings_number INT AUTO_INCREMENT PRIMARY KEY,
             id BIGINT,
@@ -42,27 +47,27 @@ def create_warnings():
     try:
         with connect(
                 host="localhost",
-                user=configs[0],
-                password=configs[1],
+                user=c['database']['user'],
+                password=c['database']['password'],
                 database="warnings",
         ) as connection:
             with connection.cursor() as cursor:
                 cursor.execute(create_warnings_query)
                 connection.commit()
     except Error as e:
-        print(e)
+        log(e)
+        
 
 
 def clear_warnings():
-    with open("configs/mysql.txt", "r") as f:
-        configs = f.read().splitlines()
+    c = open_config()
     drop_table_query = "DROP TABLE warnings"
 
     try:
         with connect(
                 host="localhost",
-                user=configs[0],
-                password=configs[1],
+                user=c['database']['user'],
+                password=c['database']['password'],
                 database="warnings",
         ) as connection:
             print(connection)
@@ -70,15 +75,16 @@ def clear_warnings():
                 cursor.execute(drop_table_query)
                 connection.commit()
     except Error as e:
-        print(e)
+        log(e)
 
 def select_warnings(ID):
+    c = open_config()
     select_warnings_query = (f"SELECT * FROM warnings WHERE id = {ID};")
     try:
         with connect(
                 host="localhost",
-                user=configs[0],
-                password=configs[1],
+                user=c['database']['user'],
+                password=c['database']['password'],
                 database="warnings",
         ) as connection:
             print(connection)
@@ -89,17 +95,19 @@ def select_warnings(ID):
                     warnings.append(warning)
                 return warnings
     except Error as e:
-        print(e)
+        log(e)
         return
+    
 def create_db():
+    c = open_config()
     try:
         with connect(
             host="localhost",
-            user=configs[0],
-            password=configs[1],
+            user=c['database']['user'],
+            password=c['database']['password'],
         ) as connection:
             create_db_query = "CREATE DATABASE IF NOT EXISTS warnings"
             with connection.cursor() as cursor:
                 cursor.execute(create_db_query)
     except Error as e:
-        print(e)
+        log(e)
