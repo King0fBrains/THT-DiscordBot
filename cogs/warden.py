@@ -5,7 +5,7 @@ from pregex.core.groups import Capture
 from pregex.core.pre import Pregex
 from pregex.core.operators import Either
 import re
-
+import asyncio
 
 class Warden(commands.Cog, description="A home for all of our warden rules."):
     def __init__(self, bot):
@@ -68,6 +68,20 @@ class Warden(commands.Cog, description="A home for all of our warden rules."):
             embed.set_footer(text=f"{message.author.mention}")
             await self.staff_channel.send(embed=embed)
             await message.delete()
+
+    @commands.Cog.listener()
+    async def on_message(self,message):
+        bot_channels =[1080860037662122076, 1080860091277901925, 914660588045602827, 940286057423994890, 812076627688161358, 1033770713565372467, 1091896767936741496, 1091896647711203458, 1091896585652285470, 1091896543382093914]
+        if message.channel.id not in bot_channels:
+            return
+        if message.author.bot:
+            return
+
+        await asyncio.sleep(5)
+        try:
+            await message.delete()
+        except commands.MessageNotFound:
+            pass
 
 async def setup(bot):
      await bot.add_cog(Warden(bot))
