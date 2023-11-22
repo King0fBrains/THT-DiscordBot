@@ -1,4 +1,13 @@
 {
-    "token": "",
-    "prefix": ""
+    "bot": {
+        "token": "",
+        "prefix": "",
+        "status": ""
+    },
+    "database":
+    {
+        "host": "localhost",
+        "user": "",
+        "password": ""
+    }
 }
