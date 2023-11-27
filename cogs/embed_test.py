@@ -6,10 +6,6 @@ class Embed(commands.Cog, description='This is a home for all of the embed comma
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print('Embed is ready.')
-
     @commands.command(name="embed", brief="This command sends an embed.", help="This command sends an embed. It has no arguments.")
     async def embed(self, ctx):
         embed = discord.Embed(title='Title', description='Description', colour=discord.Colour.blue())

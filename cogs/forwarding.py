@@ -7,10 +7,6 @@ class Forwarding(commands.Cog, description='Allows for forwarding messages from 
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_ready(self):
-        print('Forwarding is ready.')
-
-    @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.id == self.bot.user.id:
             return
