@@ -98,7 +98,7 @@ async def load():  # Load all the cogs
     for cog in ["cogs." + f.replace('.py', '') for f in os.listdir('cogs') if isfile(join('cogs', f))]:
         try:
            await bot.load_extension(cog)
-           log.info(f"Cog {cog[4:]} was successfully loaded!")
+           log.info(f"Cog {cog[5:]} was successfully loaded!")
         except Exception as e :
             log.exception(f'Unable to load {cog}\n{e}')
 
