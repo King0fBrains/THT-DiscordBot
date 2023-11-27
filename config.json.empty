@@ -3,7 +3,8 @@
         "token": "",
         "prefix": "",
         "status": "",
-        "modlog": ""
+        "modlog": "",
+        "welcome":""
     },
     "database":
     {
