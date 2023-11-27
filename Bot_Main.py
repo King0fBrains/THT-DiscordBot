@@ -42,6 +42,7 @@ def make_logs():
                 pass
         if file_length > 10000:
             os.rename('logs/discord.log', 'logs/discord-' + datetime.now().strftime('%YY-%mM-%dD-%Hh-%Mm') + '.log')
+            open('logs/discord.log', 'w').close() # Re-create the log file.
     except FileNotFoundError:
         print('No log file found.')
         open('logs/discord.log', 'w').close()
