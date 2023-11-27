@@ -10,10 +10,6 @@ class Owner(commands.Cog, description='This is a cog for the owner commands.'):
     async def cog_check(self, ctx):
         return commands.is_owner()
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print('Owner Cog is ready.')
-
     @commands.command(name='shutdown', brief='This command shuts down the bot.',
                       help='This command shuts down the bot. It has no arguments.')
     async def shutdown(self, ctx):

@@ -3,17 +3,12 @@ import pyautogui
 
 
 class RemoteControl(commands.Cog, description='This is a cog for the remote control commands.'):
-    Keys = ['z', 'x', 'up', 'down', 'left', 'right', 'enter', 'backspace', 'a', 's']
-    Roles = (878727109143580683, 810013892670521364, 993305944412921967, 1003816787181314109)
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print('Remote Control is ready.')
-
     def __init__(self, bot):
         self.bot = bot
         self.status = 2
         self.state = False
+        self.keys = ['z', 'x', 'up', 'down', 'left', 'right', 'enter', 'backspace', 'a', 's']
+        self.roles = (878727109143580683, 810013892670521364, 993305944412921967, 1003816787181314109)
 
     @commands.command(name='remote',
                       brief="This command allows for admins/moderators to manage the remote control state.",
@@ -22,6 +17,7 @@ class RemoteControl(commands.Cog, description='This is a cog for the remote cont
                            "*on* and *off* enable and disable the remote control respectively.\n "
                            "*all* and *admin* enable the remote control for all users and admins respectively.\n "
                            "*status* tells you whether the remote control is enabled or disabled.\n An example is shown below:\n\n `[p]remote on`")
+    
     @commands.has_any_role(878727109143580683, 810013892670521364, 993305944412921967, 1003816787181314109)
     async def remote(self, ctx, arg):
         if arg == 'on':

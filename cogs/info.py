@@ -9,11 +9,6 @@ class Info(commands.Cog, description='This is the home for all of the informatio
         self.bot = bot
         self.time = None
 
-    @commands.Cog.listener()
-    async def on_ready(self):  # This event is called when the bot is ready
-        print('Info is ready.')
-        self.time = datetime.datetime.now()
-
     @commands.command(name='ping', brief='This command returns the latency',
                       help='This command gives the latency. It has no arguments.')
     async def ping(self, ctx):
