@@ -29,16 +29,27 @@ def get_logger():
     logger.addHandler(handler)
     return logger
 
+def make_logs():
+    try:  # Create the logs directory if it doesn't exist
+        open('logs/discord.log', 'r').close()
+    except FileNotFoundError:
+        print("Creating log directory.")
+        os.mkdir('logs')
+    try:  # Rename the log file if it is too large, or create the log file if it doesn't exist
+        file_length = 0
+        with open('logs/discord.log', 'r') as f:
+            for file_length, line in enumerate(f):
+                pass
+        if file_length > 10000:
+            os.rename('logs/discord.log', 'logs/discord-' + datetime.now().strftime('%YY-%mM-%dD-%Hh-%Mm') + '.log')
+    except FileNotFoundError:
+        print('No log file found.')
+        open('logs/discord.log', 'w').close()
+    
 if __name__ == "__main__":
+    make_logs()
     log = get_logger()
     log.info("Starting main bot loop")
-    
-    try:
-        create_db()
-        create_modlog()
-    except Exception as e:
-        log.error(e)
-        sys.exit(0)
     
     try:
         with open("config.json") as c:
@@ -56,6 +67,13 @@ if __name__ == "__main__":
             os.mkdir('configs')
         except PermissionError:
             log.error(PermissionError)
+            
+    try:
+        create_db()
+        create_modlog()
+    except Exception as e:
+        log.error(e)
+        sys.exit(0)
 
 async def everyone_ping():
     await bot.wait_until_ready()
@@ -80,8 +98,9 @@ async def load():  # Load all the cogs
     for cog in ["cogs." + f.replace('.py', '') for f in os.listdir('cogs') if isfile(join('cogs', f))]:
         try:
            await bot.load_extension(cog)
-        except Exception:
-            log.exception(f'Unable to load {cog}')
+           log.info(f"Cog {cog[4:]} was successfully loaded!")
+        except Exception as e :
+            log.exception(f'Unable to load {cog}\n{e}')
 
 @bot.event
 async def on_ready():  # When the bot come online
@@ -89,24 +108,9 @@ async def on_ready():  # When the bot come online
     bot.loop.create_task(everyone_ping())
     await bot.change_presence(activity=discord.Game(name=config['bot']['status']))
 
-try:  # Create the logs directory if it doesn't exist
-    open('logs/discord.log', 'r').close()
-except FileNotFoundError:
-    os.mkdir('logs')
-try:  # Rename the log file if it is too large, or create the log file if it doesn't exist
-    file_length = 0
-    with open('logs/discord.log', 'r') as f:
-        for file_length, line in enumerate(f):
-            pass
-    if file_length > 10000:
-        os.rename('logs/discord.log', 'logs/discord-' + datetime.now().strftime('%YY-%mM-%dD-%Hh-%Mm') + '.log')
-except FileNotFoundError:
-    print('No log file found.')
-    open('logs/discord.log', 'w').close()
-
 async def main():
     async with bot:
         await load()
-        log.info("Successfully loaded extensions.")
         await bot.start(config['bot']['token'])
+        
 asyncio.run(main())
