@@ -142,6 +142,7 @@ def drop_db():
     except Error as e:
         log.info(e)
 
+
 def drop_modlog():
     c = open_config()
     drop_modlog_query = "DROP TABLE modlog"
@@ -157,6 +158,7 @@ def drop_modlog():
                 connection.commit()
     except Error as e:
         log.info(e)
+
 
 def select_warning(ID):
     c = open_config()
@@ -230,6 +232,7 @@ def insert_ban(id, reason, author):
         log.info(e)
         return False
 
+
 def insert_kick(id, reason, author):
     c = open_config()
     create_kick_query = "INSERT INTO modlog (id, warning, author, type) VALUES (%s, %s, %s, %s)"
@@ -248,6 +251,7 @@ def insert_kick(id, reason, author):
     except Error as e:
         log.info(e)
         return False
+
 
 def read_modlog():
     c = open_config()
@@ -270,6 +274,7 @@ def read_modlog():
         log.info(e)
         return
 
+
 def select_modlog(ID):
     c = open_config()
     select_modlog_query = f"SELECT * FROM modlog WHERE id = {ID};"
@@ -289,3 +294,76 @@ def select_modlog(ID):
     except Error as e:
         log.info(e)
         return
+
+
+def create_sticky():
+    create_sticky = """
+        CREATE TABLE IF NOT EXISTS sticky (
+            channel_id BIGINT PRIMARY KEY,
+            message VARCHAR(1000) NOT NULL
+        )
+        """
+    c = open_config()
+    with connect(
+            host="localhost",
+            user=c['database']['user'],
+            password=c['database']['password'],
+            database=c['database']['database'],
+    ) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(create_sticky)
+            connection.commit()
+
+
+def insert_sticky(channel_id, message):
+    c = open_config()
+    insert_sticky_query = "INSERT INTO sticky (channel_id, message) VALUES (%s, %s)"
+    sticky = [(channel_id, message)]
+    with connect(
+            host="localhost",
+            user=c['database']['user'],
+            password=c['database']['password'],
+            database=c['database']['database'],
+    ) as connection:
+        with connection.cursor() as cursor:
+            cursor.executemany(insert_sticky_query, sticky)
+            connection.commit()
+    return
+
+
+def read_sticky():
+    c = open_config()
+    read_sticky_query = "SELECT * FROM sticky "
+    with connect(
+            host="localhost",
+            user=c['database']['user'],
+            password=c['database']['password'],
+            database=c['database']['database'],
+    ) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(read_sticky_query)
+            stickies = []
+            for sticky in cursor:
+                stickies.append(sticky)
+    return stickies
+
+
+def delete_sticky(channel_id):
+    c = open_config()
+    delete_sticky_query = f"DELETE FROM sticky WHERE channel_id = {channel_id}"
+    with connect(
+            host="localhost",
+            user=c['database']['user'],
+            password=c['database']['password'],
+            database=c['database']['database'],
+    ) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(delete_sticky_query)
+            connection.commit()
+    return
+
+
+def setup_database():
+    create_db()
+    create_modlog()
+    create_sticky()
