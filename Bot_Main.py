@@ -10,7 +10,7 @@ from discord.ext import commands
 from os.path import isfile, join
 from datetime import datetime
 from help import MyHelp
-from database import create_modlog, create_db
+from database import setup_database
 
 def get_logger():
     logger = logging.getLogger('discord')
@@ -70,8 +70,7 @@ if __name__ == "__main__":
             log.error(PermissionError)
             
     try:
-        create_db()
-        create_modlog()
+        setup_database()
     except Exception as e:
         log.error(e)
         sys.exit(0)
