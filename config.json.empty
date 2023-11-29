@@ -4,6 +4,7 @@
         "prefix": "",
         "status": "",
         "modlog": "",
+        "serverlog": "",
         "welcome":""
     },
     "database":
