@@ -5,7 +5,8 @@
         "status": "",
         "modlog": "",
         "serverlog": "",
-        "welcome":""
+        "welcome":"",
+        "forwarding": ""
     },
     "database":
     {
