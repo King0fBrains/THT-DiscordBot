@@ -4,7 +4,6 @@ import discord
 from datetime import datetime, timedelta
 from discord.ext import commands
 
-
 class Logs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -42,7 +41,11 @@ class Logs(commands.Cog):
             emb = discord.Embed(colour=discord.Colour.red())
             emb.timestamp = datetime.now()
 
-            emb.description = f"> {message.content}"
+            # Checks if attachment was sent with no context
+            if not message.content.isspace():
+                if message.content != "":
+                    emb.description = f"> {message.content}"
+
             emb.set_author(name=f"{user.name}  ({user.id}) | Deleted message", icon_url=message.author.display_avatar)
             emb.add_field(name="**Channel**", value=message.channel.mention, inline=True)
             emb.add_field(name="**Member**", value=message.author.mention, inline=True)
@@ -53,6 +56,12 @@ class Logs(commands.Cog):
                 for i in message.attachments:
                     out += f"`{i.filename}`\n"
                 emb.add_field(name="**Attachment(s)**", value=out)
+
+            if len(message.stickers) != 0:
+                out = " "
+                for i in message.stickers:
+                    out += f"`{i.name}`\n"
+                emb.add_field(name="**Sticker(s)**", value=out)
 
             await self.logging_channel.send(embed=emb)
 
@@ -122,6 +131,9 @@ class Logs(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_update(self, origin: discord.abc.GuildChannel, edit: discord.abc.GuildChannel):
         # Needs to be more robust to catch more edits like permissions"
+        if origin.position != edit.position:
+            return
+
         emb = discord.Embed(colour=discord.Colour.orange())
         emb.timestamp = datetime.now()
         if origin.name != edit.name:
