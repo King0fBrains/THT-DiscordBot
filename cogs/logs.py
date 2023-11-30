@@ -15,33 +15,114 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        embed = discord.Embed(title=f"{member.name}  has joined the guild", colour=discord.Colour.green())
-        embed.timestamp = member.joined_at
+        emb = discord.Embed(title=f"{member.name}  has joined the guild", colour=discord.Colour.green())
+        emb.timestamp = member.joined_at
         date = member.created_at.strftime("%m/%d/%Y")
-
-        embed.set_thumbnail(url=member.display_avatar)
-        embed.add_field(name="**Member**", value=member.mention, inline=True)
-        embed.add_field(name="**Member ID**", value=f"`{member.id}`", inline=True)
-        embed.add_field(name="**Total Users**", value=member.guild.member_count, inline=True)
-        embed.add_field(name="**Account Created on:**", value=date, inline=True)
-
-        today = discord.utils.utcnow() - timedelta(days=1)
-        week = discord.utils.utcnow() - timedelta(days=7)
-        if member.created_at < today:
-            embed.description = "> This account was created today!"
-        if today < member.created_at < week:
-            embed.description = "> This account was created less than one week ago!"
-        await self.logging_channel.send(embed=embed)
+        emb.set_thumbnail(url=member.display_avatar)
+        emb.add_field(name="**Member**", value=member.mention, inline=True)
+        emb.add_field(name="**Member ID**", value=f"`{member.id}`", inline=True)
+        emb.add_field(name="**Total Users**", value=member.guild.member_count, inline=True)
+        emb.add_field(name="**Account Created on:**", value=date, inline=True)
+        await self.logging_channel.send(embed=emb)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
-        embed = discord.Embed(title=f"{member.name} has left the guild", color=discord.Colour.red())
-        embed.timestamp = datetime.now()
-        embed.set_thumbnail(url=member.display_avatar)
-        embed.add_field(name="**Member**", value=member.mention, inline=True)
-        embed.add_field(name="**Member ID**", value=f"`{member.id}`", inline=True)
-        embed.add_field(name="**Total Users**", value=member.guild.member_count, inline=True)
-        await self.logging_channel.send(embed=embed)
+        emb = discord.Embed(title=f"{member.name} has left the guild", color=discord.Colour.red())
+        emb.timestamp = datetime.now()
+        emb.set_thumbnail(url=member.display_avatar)
+        emb.add_field(name="**Member**", value=member.mention, inline=True)
+        emb.add_field(name="**Member ID**", value=f"`{member.id}`", inline=True)
+        emb.add_field(name="**Total Users**", value=member.guild.member_count, inline=True)
+        await self.logging_channel.send(embed=emb)
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message: discord.Message):
+        if message.author.id != self.bot.user.id:
+            user = message.author
+            emb = discord.Embed(colour=discord.Colour.red())
+            emb.timestamp = datetime.now()
+            emb.description = f"> {message.content}"
+            emb.set_author(name=f"{user.name}  ({user.id}) | Deleted message", icon_url=message.author.display_avatar)
+            emb.add_field(name="**Channel**", value=message.channel.mention, inline=True)
+            emb.add_field(name="**Member**", value=message.author.mention, inline=True)
+            emb.add_field(name="**Message ID**", value=f"`{message.id}`", inline=True)
+            await self.logging_channel.send(embed=emb)
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, origin: discord.Message, edit: discord.Message):
+        if origin.author.id != self.bot.user.id:
+            if not origin.author.bot:
+                emb = discord.Embed(colour=discord.Colour.orange())
+                emb.timestamp = datetime.now()
+                emb.description = f"**Original Message**:\n> {origin.content}\n\n**Edited Message**:\n> {edit.content}"
+                emb.set_author(name=f"{origin.author.name}  ({origin.author.id}) | Message edited",
+                                 icon_url=origin.author.display_avatar)
+                emb.add_field(name="**Channel**", value=origin.jump_url, inline=True)
+                emb.add_field(name="**Member**", value=origin.author.mention, inline=True)
+                emb.add_field(name="**Message ID**", value=f"`{origin.id}`", inline=True)
+                await self.logging_channel.send(embed=emb)
+
+    @commands.Cog.listener()
+    async def on_guild_role_create(self, role: discord.Role):
+        emb = discord.Embed(colour=discord.Colour.fuchsia())
+        emb.timestamp = role.created_at
+        emb.description = role.name
+        emb.set_author(name=f"New Role created ({role.id})")
+        emb.add_field(name="**Role**", value=role.mention)
+        emb.add_field(name="**Role ID**", value=role.id)
+        await self.logging_channel.send(embed=emb)
+
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role: discord.Role):
+        emb = discord.Embed(colour=discord.Colour.red())
+        emb.timestamp = datetime.now()
+        emb.description = role.name
+        emb.set_author(name=f"Role Deleted ({role.id})")
+        emb.add_field(name="**Role ID**", value=role.id)
+        await self.logging_channel.send(embed=emb)
+
+    @commands.Cog.listener()
+    async def on_guild_role_update(self, origin: discord.Role, edit: discord.Role):
+        emb = discord.Embed(colour=discord.Colour.orange())
+        emb.timestamp = datetime.now()
+        emb.description = f"**Original**\n> {origin.name}\n\n**Edit**\n> {edit.name}"
+        emb.set_author(name=f"Role Edited ({origin.id})")
+        emb.add_field(name="**Mention**", value=edit.mention)
+        emb.add_field(name="**Role ID**", value=edit.id)
+        await self.logging_channel.send(embed=emb)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
+        emb = discord.Embed(colour=discord.Colour.fuchsia())
+        emb.timestamp = channel.created_at
+        emb.description = f"> {channel.category} -> {channel.name}"
+        emb.set_author(name=f"New Channel created ({channel.id})")
+        emb.add_field(name="**Mention**", value=channel.mention)
+        emb.add_field(name="**Channel ID**", value=channel.id)
+        emb.add_field(name="**Jump**", value=channel.jump_url)
+        await self.logging_channel.send(embed=emb)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+        emb = discord.Embed(colour=discord.Colour.red())
+        emb.timestamp = datetime.now()
+        emb.description = channel.name
+        emb.set_author(name=f"Channel Deleted")
+        emb.add_field(name="**Channel ID**", value=channel.id)
+        await self.logging_channel.send(embed=emb)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_update(self, origin: discord.abc.GuildChannel, edit: discord.abc.GuildChannel):
+        # Needs to be more robust to catch more edits like permissions"
+        emb = discord.Embed(colour=discord.Colour.orange())
+        emb.timestamp = datetime.now()
+        emb.description = f"**Original**\n> {origin.name}\n\n**Edit**\n> {edit.name}"
+        emb.set_author(name=f"Channel Edited ({origin.id})")
+        emb.add_field(name="**Mention**", value=edit.mention)
+        emb.add_field(name="**Channel ID**", value=edit.id)
+        emb.add_field(name="**Jump**", value=edit.jump_url)
+
+        await self.logging_channel.send(embed=emb)
 
 
 async def setup(bot):
