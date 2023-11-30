@@ -11,7 +11,7 @@ class Logs(commands.Cog):
         with open("config.json") as c:
             config = json.load(c)
             self.channel_id = int(config['bot']['serverlog'])
-        self. logging_channel = self.bot.get_channel(self.channel_id)
+stat        self.logging_channel = self.bot.get_channel(self.channel_id)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
@@ -41,11 +41,19 @@ class Logs(commands.Cog):
             user = message.author
             emb = discord.Embed(colour=discord.Colour.red())
             emb.timestamp = datetime.now()
+
             emb.description = f"> {message.content}"
             emb.set_author(name=f"{user.name}  ({user.id}) | Deleted message", icon_url=message.author.display_avatar)
             emb.add_field(name="**Channel**", value=message.channel.mention, inline=True)
             emb.add_field(name="**Member**", value=message.author.mention, inline=True)
             emb.add_field(name="**Message ID**", value=f"`{message.id}`", inline=True)
+
+            if len(message.attachments) != 0:
+                out = " "
+                for i in message.attachments:
+                    out += f"`{i.filename}`\n"
+                emb.add_field(name="**Attachment(s)**", value=out)
+
             await self.logging_channel.send(embed=emb)
 
     @commands.Cog.listener()
@@ -56,7 +64,7 @@ class Logs(commands.Cog):
                 emb.timestamp = datetime.now()
                 emb.description = f"**Original Message**:\n> {origin.content}\n\n**Edited Message**:\n> {edit.content}"
                 emb.set_author(name=f"{origin.author.name}  ({origin.author.id}) | Message edited",
-                                 icon_url=origin.author.display_avatar)
+                               icon_url=origin.author.display_avatar)
                 emb.add_field(name="**Channel**", value=origin.jump_url, inline=True)
                 emb.add_field(name="**Member**", value=origin.author.mention, inline=True)
                 emb.add_field(name="**Message ID**", value=f"`{origin.id}`", inline=True)
@@ -95,7 +103,7 @@ class Logs(commands.Cog):
     async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
         emb = discord.Embed(colour=discord.Colour.fuchsia())
         emb.timestamp = channel.created_at
-        emb.description = f"> {channel.category} -> {channel.name}"
+        emb.description = f"> `{channel.category}` --> `{channel.name}`"
         emb.set_author(name=f"New Channel created ({channel.id})")
         emb.add_field(name="**Mention**", value=channel.mention)
         emb.add_field(name="**Channel ID**", value=channel.id)
@@ -116,12 +124,24 @@ class Logs(commands.Cog):
         # Needs to be more robust to catch more edits like permissions"
         emb = discord.Embed(colour=discord.Colour.orange())
         emb.timestamp = datetime.now()
-        emb.description = f"**Original**\n> {origin.name}\n\n**Edit**\n> {edit.name}"
+        if origin.name != edit.name:
+            emb.description = f"**Original**\n> {origin.name}\n\n**Edit**\n> {edit.name}"
+
         emb.set_author(name=f"Channel Edited ({origin.id})")
         emb.add_field(name="**Mention**", value=edit.mention)
         emb.add_field(name="**Channel ID**", value=edit.id)
         emb.add_field(name="**Jump**", value=edit.jump_url)
+        await self.logging_channel.send(embed=emb)
 
+    @commands.Cog.listener()
+    async def on_member_update(self, origin: discord.Member, edit: discord.Member):
+        emb = discord.Embed(colour=discord.Colour.orange())
+        emb.set_author(name=f"{origin.name} updated their profile",
+                       icon_url=origin.display_avatar)
+        emb.set_thumbnail(url=edit.display_avatar)
+        emb.add_field(name="**Mention**", value=origin.mention)
+        emb.add_field(name="**User ID**", value=origin.id)
+        emb.timestamp = datetime.now()
         await self.logging_channel.send(embed=emb)
 
 
