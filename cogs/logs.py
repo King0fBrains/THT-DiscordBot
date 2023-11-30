@@ -4,6 +4,7 @@ import discord
 from datetime import datetime, timedelta
 from discord.ext import commands
 
+
 class Logs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -130,8 +131,10 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_update(self, origin: discord.abc.GuildChannel, edit: discord.abc.GuildChannel):
-        # Needs to be more robust to catch more edits like permissions"
+        # Changes that I don't care about to log
         if origin.position != edit.position:
+            return
+        if origin.category != edit.category:
             return
 
         emb = discord.Embed(colour=discord.Colour.orange())
@@ -150,6 +153,7 @@ class Logs(commands.Cog):
         emb = discord.Embed(colour=discord.Colour.orange())
         emb.set_author(name=f"{origin.name} updated their profile",
                        icon_url=origin.display_avatar)
+
         emb.set_thumbnail(url=edit.display_avatar)
         emb.add_field(name="**Mention**", value=origin.mention)
         emb.add_field(name="**User ID**", value=origin.id)
