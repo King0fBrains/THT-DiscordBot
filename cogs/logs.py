@@ -11,7 +11,7 @@ class Logs(commands.Cog):
         with open("config.json") as c:
             config = json.load(c)
             self.channel_id = int(config['bot']['serverlog'])
-stat        self.logging_channel = self.bot.get_channel(self.channel_id)
+            self.logging_channel = self.bot.get_channel(self.channel_id)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
