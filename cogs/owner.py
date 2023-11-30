@@ -2,6 +2,7 @@ import logging
 import discord
 from discord.ext import commands
 
+
 class Owner(commands.Cog, description='This is a cog for the owner commands.'):
     def __init__(self, bot):
         self.bot = bot
@@ -40,39 +41,40 @@ class Owner(commands.Cog, description='This is a cog for the owner commands.'):
                                description='Restart \n'
                                            'Errors \n Welcome Message', color=discord.Color.orange())
         await ctx.send(embeds=[embed1, embed2])
-        
+
     @commands.command()
     async def reload(self, ctx, cog):
-        input = "cogs." + cog
+        c = "cogs." + cog
         try:
-            await self.bot.reload_extension(input)
-            await ctx.send(f"Reloaded extentsion `{cog}`")
+            await self.bot.reload_extension(c)
+            await ctx.send(f"Reloaded extension `{cog}`")
         except Exception as error:
             await ctx.send("Unable to reload specified extension")
             self.logger.exception(error)
-    
+
     @commands.command()
     async def load(self, ctx, cog):
-        input = "cogs." + cog
+        c = "cogs." + cog
         try:
-            await self.bot.load_extension(input)
+            await self.bot.load_extension(c)
             await ctx.send(f"Successfully loaded `{cog}`")
         except Exception as error:
-            await ctx.send("Unable to load extentsion.")
+            await ctx.send("Unable to load extension.")
             self.logger.exception(error)
-            
+
     @commands.command()
     async def unload(self, ctx, cog):
         if cog == "owner":
             await ctx.send("Unable to unload owner cog.")
             return
-        input = "cogs." + cog
+        c = "cogs." + cog
         try:
-            await self.bot.unload_extension(input)
+            await self.bot.unload_extension(c)
             await ctx.send(f"Successfully unloaded `{cog}`")
         except Exception as error:
-            await ctx.send("Unable to unload extentsion.")
+            await ctx.send("Unable to unload extension.")
             self.logger.exception(error)
-        
+
+
 async def setup(bot):
     await bot.add_cog(Owner(bot))

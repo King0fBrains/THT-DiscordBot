@@ -54,6 +54,7 @@ class Welcome(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         avatar_path = os.path.join(self.card_path, f"assets\\{member.name}.png")
 
+        # Default avatar causes issues with masking
         if member.avatar is None:
             self.make_card("cogs/assets/blank.png", member.name, member.id)
         else:

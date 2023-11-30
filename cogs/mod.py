@@ -237,29 +237,6 @@ class Mod(commands.Cog):
         if len(select_warning(member.id)) == 5:
             await ctx.invoke(self.bot.get_command('ban'), member=member, message='You have reached 5 warnings')
 
-    @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
-        channel = self.bot.get_channel(self.server_log)
-        embed = discord.Embed(title=f"{member.name}  has joined the guild", colour=discord.Colour.green())
-        embed.timestamp = member.joined_at
-        embed.set_thumbnail(url=member.display_avatar)
-        embed.add_field(name="**Member**", value=member.mention, inline=True)
-        embed.add_field(name="**Member ID**", value=f"`{member.id}`", inline=True)
-        embed.add_field(name="**Total Users**", value=member.guild.member_count, inline=True)
-        embed.add_field(name="**Account Created on:**", value=member.created_at.strftime("%m/%d/%Y"), inline=True)
-        await channel.send(embed=embed)
-
-    @commands.Cog.listener()
-    async def on_member_remove(self, member: discord.Member):
-        channel = self.bot.get_channel(self.server_log)
-        embed = discord.Embed(title=f"{member.name} has left the guild", color=discord.Colour.red())
-        embed.timestamp = datetime.now()
-        embed.set_thumbnail(url=member.display_avatar)
-        embed.add_field(name="**Member**", value=member.mention, inline=True)
-        embed.add_field(name="**Member ID**", value=f"`{member.id}`", inline=True)
-        embed.add_field(name="**Total Users**", value=member.guild.member_count, inline=True)
-        await channel.send(embed=embed)
-
 
 async def setup(bot):
     await bot.add_cog(Mod(bot))

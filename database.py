@@ -304,15 +304,19 @@ def create_sticky():
         )
         """
     c = open_config()
-    with connect(
-            host="localhost",
-            user=c['database']['user'],
-            password=c['database']['password'],
-            database=c['database']['database'],
-    ) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(create_sticky)
-            connection.commit()
+    try:
+        with connect(
+                host="localhost",
+                user=c['database']['user'],
+                password=c['database']['password'],
+                database=c['database']['database'],
+        ) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(create_sticky)
+                connection.commit()
+    except Error as e:
+        log.info(e)
+        return
 
 
 def insert_sticky(channel_id, message):
