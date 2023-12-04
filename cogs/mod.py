@@ -12,6 +12,7 @@ class Mod(commands.Cog):
         self.log = logging.getLogger('discord')
         self.modlog_channel = int(open_config()['bot']['modlog'])
         self.modlog = None
+        self.server_log = 1074724644042592266
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -103,17 +104,19 @@ class Mod(commands.Cog):
             channel = ctx.channel
         if member is None:
             await ctx.message.add_reaction('✅')
-            await channel.purge(limit=amount+1)
+            await channel.purge(limit=amount + 1)
         else:
             def check(message):
                 return message.author == member
 
-            await channel.purge(limit=amount+1, check=check)
+            await channel.purge(limit=amount + 1, check=check)
         await ctx.send(f'Deleted {amount} messages.')
 
-    @commands.command(name='role', brief='This command allows for addition/removal of roles.', help='This command allows for addition/removal of roles. It has two arguments: member and role. An example is shown below:\n\n `[p]role @member role`')
+    @commands.command(name='role', brief='This command allows for addition/removal of roles.',
+                      help='This command allows for addition/removal of roles. It has two arguments: member and role. '
+                           'An example is shown below:\n\n `[p]role @member role`')
     @commands.has_permissions(manage_roles=True)
-    async def role(self, ctx, member: discord.Member or int=None, role: discord.Role=None):
+    async def role(self, ctx, member: discord.Member or int = None, role: discord.Role = None):
         if isinstance(member, int):
             member = self.bot.fetch_user(member)
         if member == ctx.author:
@@ -137,7 +140,8 @@ class Mod(commands.Cog):
             except commands.errors.MemberNotFound:
                 await ctx.send('Invalid member')
 
-    @commands.command(name='warn', brief='This command warns a member.', help='This command warns a member. It has two arguments: member and reason.')
+    @commands.command(name='warn', brief='This command warns a member.',
+                      help='This command warns a member. It has two arguments: member and reason.')
     @commands.has_permissions(ban_members=True)
     async def warn(self, ctx, member: discord.Member or int, *, message=None):
         if isinstance(member, int):
@@ -146,19 +150,20 @@ class Mod(commands.Cog):
             message = 'No reason provided.'
         insert_warning(member.id, message, ctx.author.name)
         case = select_warning(member.id)[-1][0]
-        embed_dm = discord.Embed(title=f'You have been warned.', description=f'Reason: {message}', colour=discord.Colour.dark_red())
+        embed_dm = discord.Embed(title=f'You have been warned.', description=f'Reason: {message}',
+                                 colour=discord.Colour.dark_red())
         await member.send(embed=embed_dm)
-        embed = discord.Embed(title=f'Case #{case} Warned {member}', description=f'Reason: {message}', colour=discord.Colour.dark_red())
+        embed = discord.Embed(title=f'Case #{case} Warned {member}', description=f'Reason: {message}',
+                              colour=discord.Colour.dark_red())
         time = datetime.now().strftime("%d/%m/%Y")
         embed.set_footer(text=f'Warned by {ctx.author} at {time}')
         await ctx.send(embed=embed)
         await self.modlog.send(embed=embed)
-        if len (select_warning(member.id)) == 5:
-            await ctx.invoke(self.bot.get_command('ban'), member=member, message='You have reached 5 warnings') #44
+        if len(select_warning(member.id)) == 5:
+            await ctx.invoke(self.bot.get_command('ban'), member=member, message='You have reached 5 warnings')  # 44
 
-
-
-    @commands.command(name='warnings', brief='This command lists all of the warnings for a member.', help='This command lists all of the warnings for a member. It has one argument: member.')
+    @commands.command(name='warnings', brief='This command lists all of the warnings for a member.',
+                      help='This command lists all of the warnings for a member. It has one argument: member.')
     @commands.has_permissions(ban_members=True)
     async def warnings(self, ctx, member: discord.Member or int):
         if isinstance(member, int):
@@ -172,7 +177,8 @@ class Mod(commands.Cog):
             embed.add_field(name=f'Case #{warning[0]}', value=f'{warning[2]} - By {warning[3]}', inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(name='clearwarn', brief='This command clears a warnings for a member.', help='This command clears a warnings from a member. It has two arguments: member and case #.')
+    @commands.command(name='clearwarn', brief='This command clears a warnings for a member.',
+                      help='This command clears a warnings from a member. It has two arguments: member and case #.')
     @commands.has_permissions(ban_members=True)
     async def clearwarn(self, ctx, member: discord.Member or int, case: int):
         if isinstance(member, int):
@@ -182,12 +188,14 @@ class Mod(commands.Cog):
             if warn[0] == case:
                 clear_warn(case)
                 break
-        embed = discord.Embed(title=f'Cleared warning with Case # {case} for {member}', colour=discord.Colour.dark_red())
+        embed = discord.Embed(title=f'Cleared warning with Case # {case} for {member}',
+                              colour=discord.Colour.dark_red())
         embed.set_footer(text=f'Cleared by {ctx.author}')
         await ctx.send(embed=embed)
         await self.modlog.send(embed=embed)
 
-    @commands.command(name='cases', brief='This command lists all of the cases for a member.', help='This command lists all of the cases for a member. It has one argument: member.')
+    @commands.command(name='cases', brief='This command lists all of the cases for a member.',
+                      help='This command lists all of the cases for a member. It has one argument: member.')
     @commands.has_permissions(ban_members=True)
     async def cases(self, ctx, member: discord.Member or int):
         if isinstance(member, int):
@@ -201,14 +209,16 @@ class Mod(commands.Cog):
             embed.add_field(name=f'Case #{case[0]} - {case[4]}', value=f'{case[2]} - By {case[3]}', inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(name='kickwarn', brief='This command kicks a member.', help='This command kicks a member. It has two arguments: member and reason.')
+    @commands.command(name='kickwarn', brief='This command kicks a member.',
+                      help='This command kicks a member. It has two arguments: member and reason.')
     @commands.has_permissions(ban_members=True)
     async def kickwarn(self, ctx, member: discord.Member or int, *, message=None):
         if isinstance(member, int):
             member = self.bot.fetch_user(member)
         if message is None:
             message = 'No reason provided.'
-        embed_dm = discord.Embed(title=f'You have been kicked. Please rejoin at {self.invite}', description=f'Reason: {message}', colour=discord.Colour.dark_red())
+        embed_dm = discord.Embed(title=f'You have been kicked. Please rejoin at {self.invite}',
+                                 description=f'Reason: {message}', colour=discord.Colour.dark_red())
         await member.send(embed=embed_dm)
         await member.kick()
         if not insert_kick(member.id, message, ctx.author.name):
@@ -218,14 +228,15 @@ class Mod(commands.Cog):
             await ctx.send('Error with the database.')
             return
         case = select_modlog(member.id)[-1][0]
-        embed = discord.Embed(title=f'Cases #{case} & #{case-1} Kicked and Warned {member}', description=f'Reason: {message}', colour=discord.Colour.dark_red())
+        embed = discord.Embed(title=f'Cases #{case} & #{case - 1} Kicked and Warned {member}',
+                              description=f'Reason: {message}', colour=discord.Colour.dark_red())
         time = datetime.now().strftime("%d/%m/%Y")
         embed.set_footer(text=f'Kicked and Warned by {ctx.author} at {time}')
         await ctx.send(embed=embed)
         await self.modlog.send(embed=embed)
-        if len (select_warning(member.id)) == 5:
+        if len(select_warning(member.id)) == 5:
             await ctx.invoke(self.bot.get_command('ban'), member=member, message='You have reached 5 warnings')
+
 
 async def setup(bot):
     await bot.add_cog(Mod(bot))
-

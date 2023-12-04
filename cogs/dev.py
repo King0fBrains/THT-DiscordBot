@@ -30,7 +30,7 @@ class Dev(commands.Cog):
     @commands.command(name='eval', brief='This command evaluates input.', help='This command evaluates input. It has one argument, the input you want to evaluate.')
     async def eval(self, ctx, *, cmd):  # https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9
         """Evaluates input.
-        Input is interpreted as newline seperated statements.
+        Input is interpreted as newline separated statements.
         If the last statement is an expression, that is the return value.
         Usable globals:
           - `bot`: the bot instance

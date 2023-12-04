@@ -1,22 +1,34 @@
-from discord.ext import commands
 import discord
+import json
+
+from datetime import datetime
+from discord.ext import commands
 
 
 class Forwarding(commands.Cog, description='Allows for forwarding messages from dms to a channel.'):
     def __init__(self, bot):
         self.bot = bot
+        with open("config.json") as c:
+            config = json.load(c)
+            self.channel_id = int(config['bot']['forwarding'])
+            self.forward_channel = self.bot.get_channel(self.channel_id)
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.author.id == self.bot.user.id:
             return
         if message.guild is None:
-            channel = self.bot.get_channel(1029842105423626250)
-            embed = discord.Embed(title='DM', description=message.content, color=discord.Color.gold())
-            embed.set_footer(text=f'{message.author.name}#{message.author.discriminator}',
-                             icon_url=message.author.display_avatar)
-            await channel.send(embed=embed, files=[await attachment.to_file() for attachment in message.attachments],
-                               content=f'**Id** = {message.author.id}')
+            emb = discord.Embed(color=discord.Color.gold())
+            emb.timestamp = datetime.now()
+            emb.set_author(name=f"{message.author.name} ({message.author.id})",
+                           icon_url=message.author.display_avatar)
+            emb.description = message.content
+
+            if len(message.attachments) != 0:
+                for i in message.attachments:
+                    emb.description += f"\n> {i.proxy_url}\n"
+
+            await self.forward_channel.send(embed=emb)
             await message.add_reaction('✅')
 
     @commands.command(name='dm', aliases=['pm'], brief='This command sends a dm to a user.',
@@ -25,9 +37,9 @@ class Forwarding(commands.Cog, description='Allows for forwarding messages from 
     async def dm(self, ctx, user: discord.User, *, message):
         if ctx.author.id == self.bot.user.id:
             return
-        embed = discord.Embed(title='DM', description=message, color=discord.Color.gold())
-        embed.set_footer(text=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.display_avatar)
-        await user.send(embed=embed, files=[await attachment.to_file() for attachment in ctx.message.attachments])
+        emb = discord.Embed(title='DM', description=message, color=discord.Color.gold())
+        emb.set_footer(text=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.display_avatar)
+        await user.send(embed=emb, files=[await attachment.to_file() for attachment in ctx.message.attachments])
         await ctx.message.add_reaction('✅')
 
 

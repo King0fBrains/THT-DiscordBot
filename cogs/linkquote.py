@@ -23,9 +23,12 @@ class LinkQuote(commands.Cog, description="This cog allows for link-quoting."):
         if self.regex.get_matches(message.content):
             matches = message.content.split('/')
             message_linked = await message.channel.fetch_message(matches[-1])
-            embed = discord.Embed(title=f"{message_linked.author.name}", description=f"{message_linked.content}\n\n {message_linked.jump_url}", color=message.author.color)
+            embed = discord.Embed(title=f"{message_linked.author.name}",
+                                  description=f"{message_linked.content}\n\n {message_linked.jump_url}",
+                                  color=message.author.color)
             embed.set_thumbnail(url=message_linked.author.display_avatar.url)
             await message.channel.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(LinkQuote(bot))

@@ -1,5 +1,4 @@
 import discord
-import requests
 import os
 import json
 
@@ -19,7 +18,12 @@ class Welcome(commands.Cog):
             self.channel_id = int(config['bot']['welcome'])
 
     def make_card(self, user_image, user_name, user_id):
-        with Image.open(requests.get(user_image, stream=True).raw) as pfp:
+        """As written, this function cannot handle avatars with no transparency data
+        This is a problem with default avatars as they are 8 bit PNGs.
+        The current workaround is to return a new 'default' avatar when a user has no display avatar
+        I foresee this being an issue with other strangely formatted avatars"""
+
+        with Image.open(user_image) as pfp:
             # Create a circular mask for pfp
             mask = Image.new('L', pfp.size, 0)
             draw = ImageDraw.Draw(mask)
@@ -48,18 +52,30 @@ class Welcome(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        self.make_card(member.display_avatar, member.name, member.id)
-        path = os.path.join(self.card_path, f"assets\\{member.id}.png")
+        avatar_path = os.path.join(self.card_path, f"assets\\{member.name}.png")
 
+        # Default avatar causes issues with masking
+        if member.avatar is None:
+            self.make_card("cogs/assets/blank.png", member.name, member.id)
+        else:
+            await member.display_avatar.save(avatar_path)
+            self.make_card(os.path.join(avatar_path), member.name, member.id)
+
+        path = os.path.join(self.card_path, f"assets\\{member.id}.png")
         file = discord.File(f'{path}', filename=f"{member.id}.png")
         welcome = self.bot.get_channel(self.channel_id)
         await welcome.send(content=f"Hey {member.mention}, welcome to The High Table!\n\n"
-                                   "Make sure you click the ✅ in the <#807830259990659085> channel to gain access to the rest of the server!\n"
-                                   "Don't forget to read the Rules carefully\nEnjoy the server and remember, satisfy your greed!",
+                                   "Make sure you click the ✅ in the <#807830259990659085> channel to gain access "
+                                   "to"
+                                   "the rest of the server!\n"
+                                   "Don't forget to read the Rules carefully\nEnjoy the server and remember, "
+                                   "satisfy"
+                                   "your greed!",
                            file=file
                            )
         try:
             os.remove(path)
+            os.remove(avatar_path)
         except FileNotFoundError as e:
             print(e)
 
